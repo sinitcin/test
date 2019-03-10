@@ -14,9 +14,10 @@ use std::path::{Path, PathBuf};
 use rocket::http::RawStr;
 #[allow(unused_imports)]
 use rocket::request::{Form, FromFormValue, Request};
-use rocket::response::NamedFile;
-use rocket::response::Redirect;
+use rocket::response::{NamedFile, Redirect};
 use rocket_contrib::*;
+use rocket::http::Status;
+use rocket::response::{Failure, status};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 use std::thread;
@@ -28,6 +29,11 @@ static STOP: AtomicBool = AtomicBool::new(false);
 #[get("/")]
 fn index() -> io::Result<NamedFile> {
     NamedFile::open("static/index.html")
+}
+
+#[post("/processing", format = "application/json", data = "<photos>")]
+fn post(photos: Json<Photos>, connection: DbConn) -> Result<status::Created<Json<Photos>>, Failure> {
+    
 }
 
 #[get("/<file..>")]
@@ -47,7 +53,7 @@ fn main() {
         println!("Worker thread started. Type Ctrl+C to stop.");
         while !STOP.load(Ordering::Acquire) {
             rocket::ignite()
-                .mount("/", routes![index, files])
+                .mount("/", routes![index, files, post])
                 .register(catchers![not_found])
                 .launch();
         }
