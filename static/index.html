@@ -10,11 +10,11 @@
 	<body>
 		<div id="drop-area">
 			<form class="my-form">
-				<p>Кидайте файлы эту в область или введите URL изображения:</p>
+				<p>Кидайте файлы в эту область или введите URL изображения:</p>
 				<input type="text" class="url_edit" id="name" placeholder="URL изображения">
 				<input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
 				<div class="radios">
-					<input type="radio" id="contactChoice1" name="contact" value="multipart">
+					<input type="radio" id="contactChoice1" name="contact" value="multipart" checked>
 					<label for="contactChoice1">multipart/form-data</label>
 
 					<input type="radio" id="contactChoice2" name="contact" value="BASE64">
