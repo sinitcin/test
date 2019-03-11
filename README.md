@@ -1,3 +1,3 @@
-# test <img src="https://www.travis-ci.org/sinitcin/test.svg?branch=master">
+# test - [![Build Status](https://travis-ci.org/sinitcin/test.svg?branch=master)](https://travis-ci.org/sinitcin/test)
 --
 
