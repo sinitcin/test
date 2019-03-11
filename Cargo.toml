@@ -8,15 +8,10 @@ build = "build.rs"
 [dependencies]
 rocket = { git = "https://github.com/SergioBenitez/Rocket" }
 rocket_codegen = { git = "https://github.com/SergioBenitez/Rocket" }
-rocket-multipart-form-data = { git = "https://github.com/magiclen/rocket-multipart-form-data" }
+multipart = "*"
 serde = "*"
 serde_derive = "*"
 serde_json = "*"
-sqlite = "*"
-diesel = { version = "*", features = ["postgres"] }
-dotenv = "*"
-r2d2-diesel = "*"
-r2d2 = "*"
 
 [dependencies.rocket_contrib]
 default-features = false

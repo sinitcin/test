@@ -72,10 +72,18 @@ function previewFile(file) {
 }
 
 function uploadFile(file, i) {
-  var url = 'https://api.cloudinary.com/v1_1/joezimim007/image/upload'
+  var url = '/processing'
   var xhr = new XMLHttpRequest()
   var formData = new FormData()
   xhr.open('POST', url, true)
+
+  let rMultipart = document.getElementById("RMultipart")
+  let rBase64 = document.getElementById("RBase64")
+  let rURL = document.getElementById("RURL")
+
+
+
+  xhr.setRequestHeader('Content-Type', 'application/json')
   xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
 
   xhr.upload.addEventListener("progress", function(e) {
@@ -84,14 +92,14 @@ function uploadFile(file, i) {
 
   xhr.addEventListener('readystatechange', function(e) {
     if (xhr.readyState == 4 && xhr.status == 200) {
-      updateProgress(i, 100) // <- Add this
+      updateProgress(i, 100)
     }
     else if (xhr.readyState == 4 && xhr.status != 200) {
       // Error
     }
   })
 
-  formData.append('upload_preset', 'ujpu6gyk')
+  //formData.append('upload_preset', 'ujpu6gyk')
   formData.append('file', file)
   xhr.send(formData)
 }

@@ -65,8 +65,7 @@ fn recurse_copy(out_dir: &str, proj_dir: &str, other_dir: &str) -> Result<(), st
 
 fn main() -> Result<(), std::io::Error> {
     // Мы не в CI?
-    let not_travis = env::var("NOT_TRAVIS").unwrap_or("TRAVIS".to_string());
-    if not_travis == "LOCAL" {
+    if let Ok(_expr) = env::var("TRAVIS_RUST_VERSION") {
         return Ok(());
     }
     // Получаем переменные

@@ -1,40 +1,37 @@
 #![feature(plugin, decl_macro, proc_macro_hygiene)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
 
-#[macro_use] 
-extern crate rocket;
+#[macro_use] extern crate rocket;
+extern crate multipart;
 extern crate rocket_contrib;
-extern crate rocket_multipart_form_data;
 extern crate serde_json;
-#[macro_use] 
-extern crate serde_derive;
+
+#[macro_use] extern crate serde_derive;
 
 use std::io;
 use std::path::{Path, PathBuf};
-use rocket::http::RawStr;
-#[allow(unused_imports)]
-use rocket::request::{Form, FromFormValue, Request};
-use rocket::response::{NamedFile, Redirect};
-use rocket_contrib::*;
-use rocket::http::Status;
-use rocket::response::{Failure, status};
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 use std::thread;
 
+use rocket::http::RawStr;
+use rocket::response::{NamedFile, Redirect};
+use rocket_contrib::*;
+use rocket::http::ContentType;
+use std::io::{Cursor, Read};
+use rocket::{Request, Data, Outcome};
+use rocket::data::{self, FromData};
+use multipart::server::Multipart;
 
 #[get("/")]
 fn index() -> io::Result<NamedFile> {
     NamedFile::open("static/index.html")
 }
 
-/*
-
-#[post("/processing", format = "application/json", data = "<photos>")]
-fn post(photos: Json<Photos>, connection: DbConn) -> Result<status::Created<Json<Photos>>, Failure> {
-    
+#[post("/create", format = "application/json", data = "<data>")]
+fn create(data: String) -> String {    
+    format!("{:?}", data)
 }
-
-*/
 
 #[get("/<file..>")]
 fn files(file: PathBuf) -> Option<NamedFile> {
@@ -48,7 +45,7 @@ fn not_found(_req: &Request) -> io::Result<NamedFile> {
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index, files, /* post */ ])
+        .mount("/", routes![index, files, create])
         .register(catchers![not_found])
         .launch();
 }

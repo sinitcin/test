@@ -60,3 +60,8 @@ p {
 #fileElem {
   display: none;
 }
+
+#progress-bar {
+  width: 40%;
+  margin-left: 2em;
+}
