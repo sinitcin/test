@@ -6,14 +6,15 @@ edition = "2018"
 build = "build.rs"
 
 [dependencies]
-rocket = { git = "https://github.com/SergioBenitez/Rocket" }
-rocket_codegen = { git = "https://github.com/SergioBenitez/Rocket" }
-multipart = "*"
+rocket = "0.4"
+rocket-multipart-form-data = { git = "https://github.com/magiclen/rocket-multipart-form-data.git" }
 serde = "*"
 serde_derive = "*"
 serde_json = "*"
-
-[dependencies.rocket_contrib]
-default-features = false
-features = ["handlebars_templates", "json"]
-git = "https://github.com/SergioBenitez/Rocket"
+mime = "0.3.*"
+multipart = "0.15.*"
+chrono = "0.4.*"
+rocket-include-static-resources = "0.7"
+rocket-raw-response = "0.3"
+lazy_static = "1.2.*"
+lazy-static-include = "1.2.*"

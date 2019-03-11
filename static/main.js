@@ -71,19 +71,19 @@ function previewFile(file) {
   }
 }
 
-function uploadFile(file, i) {
-  var url = '/processing'
+function uploadFile(file, i) { 
   var xhr = new XMLHttpRequest()
-  var formData = new FormData()
-  xhr.open('POST', url, true)
+  xhr.open('POST', '/upload', true)
 
-  let rMultipart = document.getElementById("RMultipart")
-  let rBase64 = document.getElementById("RBase64")
-  let rURL = document.getElementById("RURL")
+  if (document.getElementById("RMultipart").checked) {
+    //xhr.setRequestHeader('Content-Type', 'multipart/form-data')
 
+  } else if (document.getElementById("RBase64").checked) {
+    //xhr.setRequestHeader('Content-Type', 'application/json')
 
-
-  xhr.setRequestHeader('Content-Type', 'application/json')
+  } else if (document.getElementById("RURL").checked) {
+    //xhr.setRequestHeader('Content-Type', 'application/json')
+  }
   xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
 
   xhr.upload.addEventListener("progress", function(e) {
@@ -99,7 +99,7 @@ function uploadFile(file, i) {
     }
   })
 
-  //formData.append('upload_preset', 'ujpu6gyk')
-  formData.append('file', file)
+  var formData = new FormData()
+  formData.append('image', file)
   xhr.send(formData)
 }
