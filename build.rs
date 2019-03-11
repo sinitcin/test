@@ -41,7 +41,7 @@ fn visit_dirs(dir: &Path, cb: &mut FnMut(&DirEntry)) -> std::io::Result<()> {
 }
 
 fn get_relevant_path(base_path: &str, other_path: &str) -> String {
-    other_path.trim_left_matches(base_path).to_owned()
+    other_path.trim_start_matches(base_path).to_owned()
 }
 
 fn recurse_copy(out_dir: &str, proj_dir: &str, other_dir: &str) -> Result<(), std::io::Error> {
@@ -64,6 +64,11 @@ fn recurse_copy(out_dir: &str, proj_dir: &str, other_dir: &str) -> Result<(), st
 }
 
 fn main() -> Result<(), std::io::Error> {
+    // Мы не в CI?
+    let not_travis = env::var("NOT_TRAVIS").unwrap_or("TRAVIS".to_string());
+    if not_travis == "LOCAL" {
+        return Ok(());
+    }
     // Получаем переменные
     let env_out_dir = env::var("OUT_DIR").unwrap();
     // let env_out_dir = "C:\\sci_questionnaire\\target\\debug\\build";
