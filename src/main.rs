@@ -4,7 +4,6 @@
 extern crate rocket;
 extern crate rocket_contrib;
 extern crate rocket_multipart_form_data;
-extern crate graceful;
 extern crate serde_json;
 #[macro_use] 
 extern crate serde_derive;
@@ -22,19 +21,20 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 use std::thread;
 
-use graceful::SignalGuard;
-
-static STOP: AtomicBool = AtomicBool::new(false);
 
 #[get("/")]
 fn index() -> io::Result<NamedFile> {
     NamedFile::open("static/index.html")
 }
 
+/*
+
 #[post("/processing", format = "application/json", data = "<photos>")]
 fn post(photos: Json<Photos>, connection: DbConn) -> Result<status::Created<Json<Photos>>, Failure> {
     
 }
+
+*/
 
 #[get("/<file..>")]
 fn files(file: PathBuf) -> Option<NamedFile> {
@@ -47,22 +47,8 @@ fn not_found(_req: &Request) -> io::Result<NamedFile> {
 }
 
 fn main() {
-    let signal_guard = SignalGuard::new();
-
-    let handle = thread::spawn(|| {
-        println!("Worker thread started. Type Ctrl+C to stop.");
-        while !STOP.load(Ordering::Acquire) {
-            rocket::ignite()
-                .mount("/", routes![index, files, post])
-                .register(catchers![not_found])
-                .launch();
-        }
-        println!("Bye.");
-    });
-
-    signal_guard.at_exit(move |sig| {
-        println!("Signal {} received.", sig);
-        STOP.store(true, Ordering::Release);
-        handle.join().unwrap();
-    });
+    rocket::ignite()
+        .mount("/", routes![index, files, /* post */ ])
+        .register(catchers![not_found])
+        .launch();
 }

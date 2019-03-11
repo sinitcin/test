@@ -1,1 +1,1 @@
-D:\Проекты\test\targetD:\Проекты\static
+D:\Rust\test\targetD:\Rust\static

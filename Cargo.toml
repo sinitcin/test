@@ -13,7 +13,6 @@ serde = "*"
 serde_derive = "*"
 serde_json = "*"
 sqlite = "*"
-graceful = { path = "graceful"}
 diesel = { version = "*", features = ["postgres"] }
 dotenv = "*"
 r2d2-diesel = "*"
