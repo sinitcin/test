@@ -54,6 +54,13 @@ function updateProgress(fileNumber, percent) {
   progressBar.value = total
 }
 
+function handleUrl(form) {  
+  url = document.getElementById("urlEdit").value  
+  let img = document.createElement('img')
+  img.src = url
+  document.getElementById('gallery').appendChild(img)
+}
+
 function handleFiles(files) {
   files = [...files]
   initializeProgress(files.length)
@@ -73,23 +80,11 @@ function previewFile(file) {
 
 function uploadFile(file, i) { 
   var xhr = new XMLHttpRequest()
-  xhr.open('POST', '/upload', true)
-
-  if (document.getElementById("RMultipart").checked) {
-    //xhr.setRequestHeader('Content-Type', 'multipart/form-data')
-
-  } else if (document.getElementById("RBase64").checked) {
-    //xhr.setRequestHeader('Content-Type', 'application/json')
-
-  } else if (document.getElementById("RURL").checked) {
-    //xhr.setRequestHeader('Content-Type', 'application/json')
-  }
+  xhr.open('POST', '/upload_multipart', true)
   xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
-
   xhr.upload.addEventListener("progress", function(e) {
     updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
   })
-
   xhr.addEventListener('readystatechange', function(e) {
     if (xhr.readyState == 4 && xhr.status == 200) {
       updateProgress(i, 100)
@@ -102,4 +97,32 @@ function uploadFile(file, i) {
   var formData = new FormData()
   formData.append('image', file)
   xhr.send(formData)
+}
+
+function uploadRest(files) {
+  var xhr = new XMLHttpRequest()
+  xhr.open('POST', '/upload_rest', true)
+  xhr.setRequestHeader('Accept', 'application/json')
+  xhr.setRequestHeader('Content-Type', 'application/json') 
+
+  xhr.upload.addEventListener("progress", function(e) {
+    updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
+  })
+  xhr.addEventListener('readystatechange', function(e) {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+      updateProgress(i, 100)
+    }
+    else if (xhr.readyState == 4 && xhr.status != 200) {
+      // Error
+    }
+  })
+
+  var filesData = '{"files": []}';
+  var data = JSON.parse(filesData);
+  for (var i = document.getElementById('gallery').childNodes.length - 1; i >= 0; i--) {
+    //alert(document.getElementById('gallery').childNodes[i].src);
+    data.files.push(document.getElementById('gallery').childNodes[i].src);
+    document.getElementById('gallery').removeChild(document.getElementById('gallery').childNodes[i])
+  }
+  xhr.send(JSON.stringify(data));
 }

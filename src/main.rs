@@ -3,18 +3,15 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate lazy_static_include;
-#[macro_use]
-extern crate rocket_include_static_resources;
+#[macro_use] extern crate lazy_static;
+#[macro_use] extern crate lazy_static_include;
+#[macro_use] extern crate rocket_include_static_resources;
 extern crate rocket_raw_response;
-#[macro_use]
-extern crate rocket;
+#[macro_use] extern crate rocket;
 extern crate rocket_multipart_form_data;
-extern crate serde_json;
+extern crate serde;
 #[macro_use] extern crate serde_derive;
+#[macro_use] extern crate serde_json;
 
 use std::io;
 use std::fs::File;
@@ -22,7 +19,6 @@ use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use std::thread;
-
 use rocket::Data;
 use rocket::http::ContentType;
 use rocket_multipart_form_data::mime;
@@ -31,23 +27,27 @@ use rocket_include_static_resources::EtagIfNoneMatch;
 use rocket_raw_response::RawResponse;
 use rocket::response::{Response, NamedFile, Redirect};
 use rocket::request::Request;
+use serde_json::{
+    from_reader, from_slice, from_str, from_value, to_string, to_string_pretty, to_value, to_vec,
+    to_writer, Deserializer, Number, Value,
+};
 
 #[get("/")]
 fn index() -> io::Result<NamedFile> {
     NamedFile::open("static/index.html")
 }
 
-#[post("/processing", format = "application/json", data = "<data>")]
-fn processing_json(data: String) -> String {    
+#[post("/upload_rest", format = "application/json", data = "<data>")]
+fn upload_json(data: String) -> String {
+    let v: Value = serde_json::from_str(&data).unwrap();
+    let files = v["files"].as_array();
+    for file in &files {
+        println!("{:?}", &file);
+    }
     format!("{:?}", data)
 }
 
-#[post("/processing", format = "multipart/form-data", data = "<data>")]
-fn processing_multipart(data: String) -> String {    
-    format!("{:?}", data)
-}
-
-#[post("/upload", data = "<data>")]
+#[post("/upload_multipart", data = "<data>")]
 fn upload(content_type: &ContentType, data: Data) -> RawResponse {
     let mut options = MultipartFormDataOptions::new();
     options.allowed_fields.push(MultipartFormDataField::raw("image").size_limit(32 * 1024 * 1024).content_type_by_string(Some(mime::IMAGE_STAR)).unwrap());
@@ -93,7 +93,7 @@ fn not_found(_req: &Request) -> io::Result<NamedFile> {
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index, files, upload, processing_json, processing_multipart])
+        .mount("/", routes![index, files, upload, upload_json])
         .register(catchers![not_found])
         .launch();
 }

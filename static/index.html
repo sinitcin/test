@@ -9,22 +9,20 @@
 	</head>
 	<body>
 		<div id="drop-area">
-			<form class="my-form" action="/upload" method="post" enctype="multipart/form-data">
+			<form class="my-form" action="/upload" method="post">
 				<p>Кидайте файлы в эту область или введите URL изображения:</p>
-				<input type="text" class="url_edit" id="name" placeholder="URL изображения">
+				<input type="text" class="url_edit" id="urlEdit" placeholder="URL изображения" onchange="handleUrl(this)">
+				<label class="button" for="urlEdit">+</label>
+				<div id="list" /></div>
 				<input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
 				<div class="radios">
 					<input type="radio" id="RMultipart" name="contact" value="multipart" checked>
-					<label for="RMultipart">multipart/form-data</label>
-
-					<input type="radio" id="RBase64" name="contact" value="BASE64">
-					<label for="RBase64">BASE64</label>
-
+					<label for="RMultipart">multipart / form-data</label>
 					<input type="radio" id="RURL" name="contact" value="URL">
-					<label for="RURL">URL</label>
+					<label for="RURL">BASE64 \ URL</label>
 				</div>
 				<label class="button" for="fileElem">Выбрать файлы</label>
-				<label type="submit" class="button">Отправить</label>
+				<label class="button" onclick="uploadRest(this.files)">Отправить</label>
 				<progress id="progress-bar" max=100px value=0></progress>
 			</form>
 			<div id="gallery" /></div>
