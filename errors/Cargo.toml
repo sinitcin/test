@@ -1,0 +1,10 @@
+[package]
+name = "errors"
+version = "0.1.0"
+authors = ["Антон Синицын <antony@email.su>"]
+edition = "2018"
+
+[dependencies]
+reqwest = "*"
+serde_json = "*"
+rocket = "0.4"

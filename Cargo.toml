@@ -18,3 +18,6 @@ rocket-include-static-resources = "0.7"
 rocket-raw-response = "0.3"
 lazy_static = "1.2.*"
 lazy-static-include = "1.2.*"
+reqwest = "*"
+errors = { path = "errors" }
+opencv = { path = "opencv" }
