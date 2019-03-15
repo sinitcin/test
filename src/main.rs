@@ -3,6 +3,7 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 
+extern crate regex;
 extern crate reqwest;
 #[macro_use]
 extern crate lazy_static;
@@ -19,10 +20,13 @@ extern crate serde;
 extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
+extern crate base64_stream;
 extern crate errors;
 extern crate opencv;
 
+use base64_stream::FromBase64Reader;
 use errors::*;
+use regex::Regex;
 use rocket::http::ContentType;
 use rocket::request::Request;
 use rocket::response::{NamedFile, Redirect, Response};
@@ -40,8 +44,8 @@ use serde_json::{
 };
 use std::fs::File;
 use std::io;
-use std::io::{Error, ErrorKind};
 use std::io::prelude::*;
+use std::io::{Error, ErrorKind, Cursor};
 use std::path::{Path, PathBuf};
 use std::thread;
 use std::time::Duration;
@@ -54,7 +58,6 @@ fn index() -> io::Result<NamedFile> {
 fn upload_from_json(data: String) -> Result<String, SimpleError> {
     let v: Value = serde_json::from_str(&data)?;
     let files = v["files"].as_array().unwrap();
-    dbg!(files);
     let client = reqwest::Client::builder()
         .proxy(
             reqwest::Proxy::http("http://proxy.bolid.ru:3128")?
@@ -68,9 +71,31 @@ fn upload_from_json(data: String) -> Result<String, SimpleError> {
         .build()?;
     for file in files {
         let file = file.as_str().unwrap();
-        dbg!(file);
         if file.starts_with("data:image/") {
-
+            // dbg!(file);
+            let regex = match Regex::new(r"(?m)data:image.([a-z]*);base64,") {
+                Ok(r) => r,
+                Err(e) => {
+                    return Err(SimpleError::IoError(Error::new(
+                        ErrorKind::Other,
+                        format!(
+                            "Не смог скомпилировать регулярное выражение: {}",
+                            e
+                        ),
+                    )));
+                }
+            };
+            let matches = regex.captures_iter(file).nth(0).unwrap();
+            let head = &matches[0];
+            let fname = Path::new("upload")
+                .join("byjson")
+                .with_extension(&matches[1]);
+            let body = file.trim_start_matches(head);
+            let mut reader = FromBase64Reader::new(Cursor::new(body));
+            let mut data = Vec::new();
+            reader.read_to_end(&mut data).unwrap();
+            let mut file = File::create(fname)?;
+            file.write_all(data.as_slice())?;
         } else if file.starts_with("http") {
             let mut response = client.get(file).send()?;
             let mut dest = {
@@ -79,7 +104,10 @@ fn upload_from_json(data: String) -> Result<String, SimpleError> {
             };
             std::io::copy(&mut response, &mut dest)?;
         } else {
-            SimpleError::IoError(Error::new(ErrorKind::Other, "Не известный формат изображения."));
+            SimpleError::IoError(Error::new(
+                ErrorKind::InvalidData,
+                "Не известный формат изображения.",
+            ));
         }
     }
     Ok(data)

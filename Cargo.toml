@@ -6,6 +6,7 @@ edition = "2018"
 build = "build.rs"
 
 [dependencies]
+regex = "*"
 rocket = "0.4"
 rocket-multipart-form-data = { git = "https://github.com/magiclen/rocket-multipart-form-data.git" }
 serde = "*"
@@ -21,3 +22,4 @@ lazy-static-include = "1.2.*"
 reqwest = "*"
 errors = { path = "errors" }
 opencv = { path = "opencv" }
+base64-stream = "*"

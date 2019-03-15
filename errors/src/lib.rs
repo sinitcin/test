@@ -34,6 +34,7 @@ impl From<serde_json::Error> for SimpleError {
 
 impl<'r> Responder<'r> for SimpleError {
     fn respond_to(self, _: &Request) -> response::Result<'r> {
+        // Сильно не будем морочиться с обработкой ошибок в тестовом задании
         Response::build()
             .status(Status::NotAcceptable)
             .sized_body(Cursor::new(""))
