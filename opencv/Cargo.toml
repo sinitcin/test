@@ -5,3 +5,4 @@ authors = ["Антон Синицын <antony@email.su>"]
 edition = "2018"
 
 [dependencies]
+libc = "*"
