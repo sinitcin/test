@@ -45,7 +45,7 @@ use serde_json::{
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
-use std::io::{Error, ErrorKind, Cursor};
+use std::io::{Cursor, Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::thread;
 use std::time::Duration;
@@ -115,7 +115,11 @@ fn upload_from_json(data: String) -> Result<String, SimpleError> {
 
 #[post("/upload_rest", format = "application/json", data = "<data>")]
 fn upload_rest(data: String) -> String {
-    let _ = upload_from_json(data);
+    let result = upload_from_json(data);
+    match result {
+        Ok(_) => { /* Передать изменённые файлы обратно */ }
+        Err(_) => { /* Сообщить об ошибке */ }
+    }
     "".to_string()
 }
 
@@ -177,7 +181,21 @@ fn upload_multipart(content_type: &ContentType, data: Data) -> RawResponse {
 
                 RawResponse::from_vec(data, file_name, content_type)
             }
-            RawField::Multiple(_) => unreachable!(),
+            RawField::Multiple(raws) => {
+                for raw in raws {
+                    //let content_type = raw.content_type;
+                    let file_name = raw.file_name.unwrap_or("Image".to_string());
+                    let data = raw.raw;
+
+                    let mut file =
+                        File::create(Path::new("upload").join(&file_name).to_str().unwrap())
+                            .unwrap();
+                    file.write_all(&data).unwrap();
+
+                    //RawResponse::from_vec(data, file_name, content_type)
+                }
+                unreachable!()
+            }
         },
         None => RawResponse::from_vec(
             "Please input a file.".bytes().collect(),
