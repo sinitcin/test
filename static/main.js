@@ -54,7 +54,60 @@ function updateProgress(fileNumber, percent) {
   progressBar.value = total
 }
 
-function handleUrl(form) {  
+function clearGalery() {
+  for (var i = document.getElementById('gallery').childNodes.length - 1; i >= 0; i--) {
+    document.getElementById('gallery').removeChild(document.getElementById('gallery').childNodes[i])
+  }
+}
+
+function GetDataType(url) {
+  if (url)
+  {
+     var base64 = url.toString().match(/data:image.([a-z]*);base64/);
+     if (base64 && base64.length > 1)
+     {
+       return base64[1];
+     }
+  }
+  return "";
+}
+
+function GetFileName(url)
+{
+   if (url)
+   {
+      var base64 = url.toString().match(/data:image.([a-z]*);base64/);
+      if (base64 && base64.length > 1)
+      {
+        return base64[1];
+      }
+      var m = url.toString().match(/.*\/(.+?)\./);
+      if (m && m.length > 1)
+      {
+        return m[1];
+      }
+   }
+   return "";
+}
+
+function getFilesFromGallery() {
+  let rslt = [];
+  const childNodes = document.querySelector('#gallery').childNodes
+  let count = 0
+  childNodes.forEach(function(node) {
+      let imgUrl = node.src
+      rslt.push(fetch(imgUrl).then(function(rslt){
+          let filename = 'file_'+ count + '.' + GetFileName(imgUrl);
+          count++;
+          console.log(rslt)
+          let file = new File([rslt.url], filename, {type: 'image/' + GetDataType(imgUrl)});
+          return file
+      }));
+  });
+  return Promise.all(rslt)
+}
+
+function loadFromUrl() {  
   url = document.getElementById("urlEdit").value  
   let img = document.createElement('img')
   img.src = url
@@ -62,10 +115,19 @@ function handleUrl(form) {
 }
 
 function handleFiles(files) {
-  files = [...files]
+  files = [...files]  
   initializeProgress(files.length)
-  files.forEach(uploadFile)
   files.forEach(previewFile)
+}
+
+function upload() {
+  let rMultipart = document.getElementById("RMultipart")
+  if (rMultipart.checked == true) {
+    uploadFiles();
+  } else {
+    uploadRest();
+  }
+  clearGalery();
 }
 
 function previewFile(file) {
@@ -78,28 +140,42 @@ function previewFile(file) {
   }
 }
 
-function uploadFile(file, i) { 
-  var xhr = new XMLHttpRequest()
-  xhr.open('POST', '/upload_multipart', true)
-  xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
-  xhr.upload.addEventListener("progress", function(e) {
-    updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
-  })
-  xhr.addEventListener('readystatechange', function(e) {
-    if (xhr.readyState == 4 && xhr.status == 200) {
-      updateProgress(i, 100)
-    }
-    else if (xhr.readyState == 4 && xhr.status != 200) {
-      // Error
-    }
-  })
+function uploadFiles() { 
 
-  var formData = new FormData()
-  formData.append('image', file)
-  xhr.send(formData)
+  getFilesFromGallery().then(
+    function(files) {
+      var formData = new FormData();
+      files.forEach(
+        function(file) {
+          formData.append('images[]', file);
+        }
+      );
+      var xhr = new XMLHttpRequest()
+      xhr.open('POST', '/upload_multipart?img_count=' + files.length, true)
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+      /*
+      xhr.upload.addEventListener("progress", function(e) {
+        updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
+      });
+      xhr.addEventListener('readystatechange', function(e) {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+          updateProgress(i, 100)
+        }
+        else if (xhr.readyState == 4 && xhr.status != 200) {
+          // Error
+        }
+      });
+      */
+      xhr.onreadystatechange = function() { 
+        if (xhr.readyState != 4) return;
+        alert(xhr.responseText);  
+      };
+      xhr.send(formData);
+    }
+  );
 }
 
-function uploadRest(files) {
+function uploadRest() {
   var xhr = new XMLHttpRequest()
   xhr.open('POST', '/upload_rest', true)
   xhr.setRequestHeader('Accept', 'application/json')
@@ -120,9 +196,8 @@ function uploadRest(files) {
   var filesData = '{"files": []}';
   var data = JSON.parse(filesData);
   for (var i = document.getElementById('gallery').childNodes.length - 1; i >= 0; i--) {
-    //alert(document.getElementById('gallery').childNodes[i].src);
     data.files.push(document.getElementById('gallery').childNodes[i].src);
-    document.getElementById('gallery').removeChild(document.getElementById('gallery').childNodes[i])
+    //document.getElementById('gallery').removeChild(document.getElementById('gallery').childNodes[i])
   }
   xhr.send(JSON.stringify(data));
 }

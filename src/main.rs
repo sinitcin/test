@@ -50,6 +50,8 @@ use std::path::{Path, PathBuf};
 use std::thread;
 use std::time::Duration;
 
+const MAX_IMG_COUNT: u32 = 25;
+
 #[get("/")]
 fn index() -> io::Result<NamedFile> {
     NamedFile::open("static/index.html")
@@ -123,15 +125,29 @@ fn upload_rest(data: String) -> String {
     "".to_string()
 }
 
-#[post("/upload_multipart", data = "<data>")]
-fn upload_multipart(content_type: &ContentType, data: Data) -> RawResponse {
+#[post("/upload_multipart?<img_count>", data = "<data>")]
+fn upload_multipart(content_type: &ContentType, img_count: u32, data: Data) -> RawResponse {
+    if img_count > MAX_IMG_COUNT {
+        return RawResponse::from_vec(
+            format!(
+                "Нельзя загружать больше {} изображений за один раз.",
+                img_count
+            )
+            .bytes()
+            .collect(),
+            "",
+            Some(mime::TEXT_PLAIN_UTF_8),
+        );
+    }
     let mut options = MultipartFormDataOptions::new();
-    options.allowed_fields.push(
-        MultipartFormDataField::raw("image")
-            .size_limit(32 * 1024 * 1024)
-            .content_type_by_string(Some(mime::IMAGE_STAR))
-            .unwrap(),
-    );
+    for _ in 0..img_count {
+        options.allowed_fields.push(
+            MultipartFormDataField::raw("images[]")
+                .size_limit(32 * 1024 * 1024)
+                .content_type_by_string(Some(mime::IMAGE_STAR))
+                .unwrap(),
+        );
+    }
 
     let mut multipart_form_data = match MultipartFormData::parse(content_type, data, options) {
         Ok(multipart_form_data) => multipart_form_data,
@@ -166,13 +182,14 @@ fn upload_multipart(content_type: &ContentType, data: Data) -> RawResponse {
         },
     };
 
-    let image = multipart_form_data.raw.remove(&"image".to_string());
+    let image = multipart_form_data.raw.remove(&"images[]".to_string());
 
     match image {
         Some(image) => match image {
             RawField::Single(raw) => {
+                println!("RawField::Single");
                 let content_type = raw.content_type;
-                let file_name = raw.file_name.unwrap_or("Image".to_string());
+                let file_name = raw.file_name.unwrap_or("images[]".to_string());
                 let data = raw.raw;
 
                 let mut file =
@@ -182,9 +199,10 @@ fn upload_multipart(content_type: &ContentType, data: Data) -> RawResponse {
                 RawResponse::from_vec(data, file_name, content_type)
             }
             RawField::Multiple(raws) => {
+                println!("RawField::Multiple");
                 for raw in raws {
                     //let content_type = raw.content_type;
-                    let file_name = raw.file_name.unwrap_or("Image".to_string());
+                    let file_name = raw.file_name.unwrap_or("images[]".to_string());
                     let data = raw.raw;
 
                     let mut file =
@@ -198,7 +216,7 @@ fn upload_multipart(content_type: &ContentType, data: Data) -> RawResponse {
             }
         },
         None => RawResponse::from_vec(
-            "Please input a file.".bytes().collect(),
+            "Вы не отправили ни одного файла, загружать нечего.".bytes().collect(),
             "",
             Some(mime::TEXT_PLAIN_UTF_8),
         ),

@@ -11,7 +11,7 @@
 		<div id="drop-area">
 			<form class="my-form" action="/upload" method="post">
 				<p>Кидайте файлы в эту область или введите URL изображения:</p>
-				<input type="text" class="url_edit" id="urlEdit" placeholder="URL изображения" onchange="handleUrl(this)">
+				<input type="text" class="url_edit" id="urlEdit" placeholder="URL изображения" onchange="loadFromUrl()">
 				<label class="button" for="urlEdit">+</label>
 				<div id="list" /></div>
 				<input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
@@ -22,7 +22,7 @@
 					<label for="RURL">BASE64 \ URL</label>
 				</div>
 				<label class="button" for="fileElem">Выбрать файлы</label>
-				<label class="button" onclick="uploadRest(this.files)">Отправить</label>
+				<label class="button" onclick="upload()">Отправить</label>
 				<progress id="progress-bar" max=100px value=0></progress>
 			</form>
 			<div id="gallery" /></div>
