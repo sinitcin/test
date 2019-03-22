@@ -1,6 +1,6 @@
 # test - [![Build Status](https://travis-ci.org/sinitcin/test.svg?branch=master)](https://travis-ci.org/sinitcin/test)
 --
-## План выолнения:
+## План выполнения:
 1. ~~Возможность загружать несколько файлов.~~
 2. ~~Возможность принимать multipart/form-data запросы.~~
 3. ~~Возможность принимать JSON запросы с BASE64 закодированными изображениями.~~
