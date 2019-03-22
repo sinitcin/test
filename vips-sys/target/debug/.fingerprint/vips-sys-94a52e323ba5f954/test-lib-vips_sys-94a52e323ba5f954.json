@@ -1,0 +1,1 @@
+{"rustc":817528400085927138,"features":"[]","target":7895656044044709589,"profile":8248545651247322450,"path":4464805379942900436,"deps":[["libc v0.2.51","libc",5352939217047212966]],"local":[{"MtimeBased":[[1553874065,460445923],".fingerprint/vips-sys-94a52e323ba5f954/dep-test-lib-vips_sys-94a52e323ba5f954"]}],"rustflags":[],"edition":"Edition2018"}
