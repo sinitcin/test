@@ -76,16 +76,12 @@ function GetFileName(url)
 {
    if (url)
    {
-      var base64 = url.toString().match(/data:image.([a-z]*);base64/);
-      if (base64 && base64.length > 1)
+      var base64 = GetDataType(url);
+      if (base64 != '')
       {
-        return base64[1];
+        return base64;
       }
-      var m = url.toString().match(/.*\/(.+?)\./);
-      if (m && m.length > 1)
-      {
-        return m[1];
-      }
+      return url.split('.').pop();
    }
    return "";
 }
@@ -96,12 +92,15 @@ function getFilesFromGallery() {
   let count = 0
   childNodes.forEach(function(node) {
       let imgUrl = node.src
-      promises.push(fetch('https://cors-anywhere.herokuapp.com/' + imgUrl).then(function(response) {
+      let genericUrl = imgUrl;
+      if (GetDataType(imgUrl) == '') {
+        genericUrl = 'https://cors-anywhere.herokuapp.com/' + imgUrl;
+      } 
+      promises.push(fetch(genericUrl).then(function(response) {
         return response.blob();
       }).then(function(imgBlob){
           let filename = 'file_'+ count + '.' + GetFileName(imgUrl);
           count++;
-          console.log(imgBlob)
           let file = new File([imgBlob], filename, {type: 'image/' + GetDataType(imgUrl)});
           return file
       }));
@@ -155,7 +154,6 @@ function uploadFiles() {
       var xhr = new XMLHttpRequest()
       xhr.open('POST', '/upload_multipart?img_count=' + files.length, true)
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
-      /*
       xhr.upload.addEventListener("progress", function(e) {
         updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
       });
@@ -163,15 +161,7 @@ function uploadFiles() {
         if (xhr.readyState == 4 && xhr.status == 200) {
           updateProgress(i, 100)
         }
-        else if (xhr.readyState == 4 && xhr.status != 200) {
-          // Error
-        }
       });
-      */
-      xhr.onreadystatechange = function() { 
-        if (xhr.readyState != 4) return;
-        alert(xhr.responseText);  
-      };
       xhr.send(formData);
     }
   );
@@ -190,16 +180,12 @@ function uploadRest() {
     if (xhr.readyState == 4 && xhr.status == 200) {
       updateProgress(i, 100)
     }
-    else if (xhr.readyState == 4 && xhr.status != 200) {
-      // Error
-    }
   })
 
   var filesData = '{"files": []}';
   var data = JSON.parse(filesData);
   for (var i = document.getElementById('gallery').childNodes.length - 1; i >= 0; i--) {
     data.files.push(document.getElementById('gallery').childNodes[i].src);
-    //document.getElementById('gallery').removeChild(document.getElementById('gallery').childNodes[i])
   }
   xhr.send(JSON.stringify(data));
 }

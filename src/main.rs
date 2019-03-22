@@ -71,7 +71,7 @@ fn upload_from_json(data: String) -> Result<String, SimpleError> {
         )
         .use_default_tls()
         .build()?;
-    for file in files {
+    for (filenum, file) in files.iter().enumerate() {
         let file = file.as_str().unwrap();
         if file.starts_with("data:image/") {
             // dbg!(file);
@@ -90,7 +90,7 @@ fn upload_from_json(data: String) -> Result<String, SimpleError> {
             let matches = regex.captures_iter(file).nth(0).unwrap();
             let head = &matches[0];
             let fname = Path::new("upload")
-                .join("byjson")
+                .join(format!("byjson_{}", filenum))
                 .with_extension(&matches[1]);
             let body = file.trim_start_matches(head);
             let mut reader = FromBase64Reader::new(Cursor::new(body));
@@ -216,7 +216,9 @@ fn upload_multipart(content_type: &ContentType, img_count: u32, data: Data) -> R
             }
         },
         None => RawResponse::from_vec(
-            "Вы не отправили ни одного файла, загружать нечего.".bytes().collect(),
+            "Вы не отправили ни одного файла, загружать нечего."
+                .bytes()
+                .collect(),
             "",
             Some(mime::TEXT_PLAIN_UTF_8),
         ),

@@ -1,1 +1,1 @@
-D:\Rust\test\targetD:\Rust\static
+d:\Rust\test\targetd:\Rust\static

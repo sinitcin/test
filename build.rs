@@ -1,7 +1,9 @@
+extern crate bindgen;
+
 use std::env;
 use std::fs::{self, DirEntry};
 use std::io::prelude::*;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 fn get_exedir(env_path: &str, level: u8) -> String {
     let mut curr_level = 0;
@@ -20,7 +22,8 @@ fn get_exedir(env_path: &str, level: u8) -> String {
             } else {
                 '\0'
             }
-        }).collect();
+        })
+        .collect();
     out_dir.retain(|c| c != '\0');
     out_dir
 }
@@ -57,17 +60,35 @@ fn recurse_copy(out_dir: &str, proj_dir: &str, other_dir: &str) -> Result<(), st
         println!("{:?}", relevant_path);
 
         let dir_path = Path::new(&relevant_path).parent().unwrap();
-        let _ = fs::create_dir_all(format!("{}{}", out_dir, dir_path.to_string_lossy())).unwrap_or(());
+        let _ =
+            fs::create_dir_all(format!("{}{}", out_dir, dir_path.to_string_lossy())).unwrap_or(());
         fs::copy(&template_path, format!("{}{}", out_dir, relevant_path)).unwrap();
     })?;
     Ok(())
 }
 
+fn generate_bindings() {
+    println!("cargo:rustc-link-lib=ImageMagick");
+    let bindings = bindgen::Builder::default()
+        .header("wrapper.h")
+        .generate()
+        .expect("Unable to generate bindings");
+    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    bindings
+        .write_to_file(out_path.join("bindings.rs"))
+        .expect("Couldn't write bindings!");
+}
+
 fn main() -> Result<(), std::io::Error> {
+    
     // Мы не в CI?
     if let Ok(_expr) = env::var("TRAVIS_RUST_VERSION") {
         return Ok(());
     }
+
+    // Создание биндингов
+    generate_bindings();
+
     // Получаем переменные
     let env_out_dir = env::var("OUT_DIR").unwrap();
     // let env_out_dir = "C:\\sci_questionnaire\\target\\debug\\build";

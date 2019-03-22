@@ -5,6 +5,9 @@ authors = ["Антон Синицын <antony@email.su>"]
 edition = "2018"
 build = "build.rs"
 
+[build-dependencies]
+bindgen = "*"
+
 [dependencies]
 regex = "*"
 rocket = "0.4"
