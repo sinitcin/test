@@ -91,20 +91,22 @@ function GetFileName(url)
 }
 
 function getFilesFromGallery() {
-  let rslt = [];
+  let promises = [];
   const childNodes = document.querySelector('#gallery').childNodes
   let count = 0
   childNodes.forEach(function(node) {
       let imgUrl = node.src
-      rslt.push(fetch(imgUrl).then(function(rslt){
+      promises.push(fetch('https://cors-anywhere.herokuapp.com/' + imgUrl).then(function(response) {
+        return response.blob();
+      }).then(function(imgBlob){
           let filename = 'file_'+ count + '.' + GetFileName(imgUrl);
           count++;
-          console.log(rslt)
-          let file = new File([rslt.url], filename, {type: 'image/' + GetDataType(imgUrl)});
+          console.log(imgBlob)
+          let file = new File([imgBlob], filename, {type: 'image/' + GetDataType(imgUrl)});
           return file
       }));
   });
-  return Promise.all(rslt)
+  return Promise.all(promises);
 }
 
 function loadFromUrl() {  
