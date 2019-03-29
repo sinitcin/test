@@ -23,6 +23,7 @@ extern crate serde_json;
 extern crate base64_stream;
 extern crate errors;
 extern crate opencv;
+extern crate vips_sys;
 
 use base64_stream::FromBase64Reader;
 use errors::*;
@@ -49,6 +50,7 @@ use std::io::{Cursor, Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::thread;
 use std::time::Duration;
+use std::ffi::CString;
 
 const MAX_IMG_COUNT: u32 = 25;
 

@@ -87,7 +87,7 @@ fn main() -> Result<(), std::io::Error> {
     }
 
     // Создание биндингов
-    generate_bindings();
+    //generate_bindings();
 
     // Получаем переменные
     let env_out_dir = env::var("OUT_DIR").unwrap();
@@ -96,11 +96,6 @@ fn main() -> Result<(), std::io::Error> {
     let proj_dir = get_exedir(&env_out_dir, 2);
     let templates_dir = format!("{}\\templates", proj_dir);
     let static_dir = format!("{}\\static", proj_dir);
-
-    let mut file = std::fs::File::create("foo.txt")?;
-    file.write_all(out_dir.as_bytes())?;
-    file.write_all(&static_dir.as_bytes())?;
-
     // Сканируем директории шаблонов
     recurse_copy(&out_dir, &proj_dir, &templates_dir)?;
     recurse_copy(&out_dir, &proj_dir, &static_dir)?;
