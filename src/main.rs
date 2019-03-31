@@ -22,7 +22,6 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate base64_stream;
 extern crate errors;
-extern crate opencv;
 extern crate vips_sys;
 
 use base64_stream::FromBase64Reader;
