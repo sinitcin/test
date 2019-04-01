@@ -3,7 +3,7 @@ rust:
   - nightly
 env:
   global:
-  - PACKAGE_NAME=setup
+  - PACKAGE_NAME=lin64_bin
 matrix:
   allow_failures:
     - rust: nightly
@@ -25,8 +25,6 @@ before_deploy:
     sudo chown -R root:root ./deb
     find ./deb -type f -exec chmod 644 {} \;
     find ./deb -type d -exec chmod 755 {} \;    
-    dpkg-deb --build $PACKAGE_NAME
-    mv $PACKAGE_NAME.deb $PACKAGE_NAME_VERSION
     tar -czf ./deb/$PACKAGE_NAME_VERSION.tar.gz ./deb
 deploy:
   provider: releases
