@@ -12,7 +12,7 @@ script:
 deploy:
   provider: releases
   api_key:
-    secure: "54d38a51f2d466512b66a7fb4505d0410ca264c0"
+    secure: 63ccede76c573efa918ad7c6103d804d97c5af89
   file: "./target/debug/test"
   skip_cleanup: true
   on:
