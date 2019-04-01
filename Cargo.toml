@@ -23,6 +23,6 @@ rocket-raw-response = "0.3"
 lazy_static = "1.2.*"
 lazy-static-include = "1.2.*"
 reqwest = "*"
+base64-stream = "*"
 errors = { path = "errors" }
 vips-sys = { path = "vips-sys" }
-base64-stream = "*"

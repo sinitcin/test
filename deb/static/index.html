@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>
+        Тестовое задание
+		</title>
+		<link rel="stylesheet" media="all" href="style.css" />
+	</head>
+	<body>
+		<div id="drop-area">
+			<form class="my-form" action="/upload" method="post">
+				<p>Кидайте файлы в эту область или введите URL изображения:</p>
+				<input type="text" class="url_edit" id="urlEdit" placeholder="URL изображения" onchange="loadFromUrl()">
+				<label class="button" for="urlEdit">+</label>
+				<div id="list" /></div>
+				<input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
+				<div class="radios">
+					<input type="radio" id="RMultipart" name="contact" value="multipart" checked>
+					<label for="RMultipart">multipart / form-data</label>
+					<input type="radio" id="RURL" name="contact" value="URL">
+					<label for="RURL">BASE64 \ URL</label>
+				</div>
+				<label class="button" for="fileElem">Выбрать файлы</label>
+				<label class="button" onclick="upload()">Отправить</label>
+				<progress id="progress-bar" max=100px value=0></progress>
+			</form>
+			<div id="gallery" /></div>
+		</div>
+		<script src="main.js"></script>
+	</body>
+</html>

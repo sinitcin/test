@@ -1,19 +1,40 @@
 language: rust
 rust:
   - nightly
+env:
+  global:
+  - PACKAGE_NAME=setup
 matrix:
   allow_failures:
     - rust: nightly
 before_install:
   - sudo apt-get install libvips*
+  - export BUILD_VERSION=$(date "+%Y%m%d").$TRAVIS_BUILD_NUMBER
+  - export PACKAGE_NAME_VERSION=$PACKAGE_NAME.$BUILD_VERSION.deb
 script:
   - cargo build --verbose --all
   - cargo test --verbose --all
+after_success:
+  - ls -l $PACKAGE_NAME_VERSION
+  - md5sum $PACKAGE_NAME_VERSION
+before_deploy: 
+  - |
+    mkdir -p deb/static
+    cp target/debug/test ./deb/
+    cp -r static/* ./deb/static/
+    sudo chown -R root:root ./deb
+    find ./deb -type f -exec chmod 644 {} \;
+    find ./deb -type d -exec chmod 755 {} \;    
+    dpkg-deb --build $PACKAGE_NAME
+    mv $PACKAGE_NAME.deb $PACKAGE_NAME_VERSION
+    tar -czf ./deb/$PACKAGE_NAME_VERSION.tar.gz ./deb
 deploy:
   provider: releases
   api_key: $GITHUB_TOKEN
-  file: "./target/debug/test"
+  file: "./deb/$PACKAGE_NAME_VERSION.tar.gz"
   skip_cleanup: true
   on:
     branch: master
     tags: true
+after_deploy:
+  - rm -rf .deb
