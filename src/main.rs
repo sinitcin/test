@@ -42,6 +42,7 @@ use serde_json::{
     from_reader, from_slice, from_str, from_value, to_string, to_string_pretty, to_value, to_vec,
     to_writer, Deserializer, Number, Value,
 };
+use std::ffi::CString;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
@@ -49,7 +50,6 @@ use std::io::{Cursor, Error, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::thread;
 use std::time::Duration;
-use std::ffi::CString;
 
 const MAX_IMG_COUNT: u32 = 25;
 

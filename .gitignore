@@ -13,3 +13,4 @@ Cargo.lock
 **/*.rs.bk
 .vs
 package-lock.json
+deb

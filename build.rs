@@ -80,7 +80,6 @@ fn generate_bindings() {
 }
 
 fn main() -> Result<(), std::io::Error> {
-    
     // Мы не в CI?
     if let Ok(_expr) = env::var("TRAVIS_RUST_VERSION") {
         return Ok(());
