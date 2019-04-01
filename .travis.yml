@@ -15,6 +15,5 @@ deploy:
   file: "./target/debug/test"
   skip_cleanup: true
   on:
-    repo: https://github.com/sinitcin/test
     branch: master
     tags: true
