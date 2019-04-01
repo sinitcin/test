@@ -12,7 +12,8 @@ jobs:
             - cargo-v1-
       - run: cargo update
       - run: cargo fetch
-      - run: apt-get install libvips*
+      - run: apt-get update
+      - run: apt-get install libvips* --y
       - persist_to_workspace:
           root: "."
           paths:
