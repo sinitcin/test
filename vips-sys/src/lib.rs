@@ -13,8 +13,8 @@ static ERROR_CROP: &str = "обрезки";
 static ERROR_SAVE: &str = "сохранения";
 
 use std::ffi::CString;
-use std::fs;
 use std::os::raw::{c_char, c_int};
+use std::{io, ptr};
 
 ///
 /// # Библиотека VIPS
@@ -24,8 +24,6 @@ use std::os::raw::{c_char, c_int};
 /// ```
 //  # Биндинги
 //
-use std::path::Path;
-use std::ptr;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -655,31 +653,50 @@ extern "C" {
 }
 
 // Безопасный интерфейс
-pub struct Visp {
-    pub image: Option<VipsImage>,
-}
-
-impl Visp {
-    pub fn new() -> Self {
-        Visp { image: None }
-    }
-
-    pub fn load(&mut self, file_name: &Path) {
-        unsafe {
-            let vimage =
-                vips_image_new_from_file(CString::new(PATH_OWL).expect(CSTRING_FAILED).as_ptr(), 0);
-            assert_ne!(
-                vimage as usize, 0,
+fn crop_image(from_file: &str, to_file: &str, width: i32, height: i32) -> io::Result<i32> {
+    let image = unsafe {
+        let result =
+            vips_image_new_from_file(CString::new(from_file).expect(CSTRING_FAILED).as_ptr(), 0);
+        // Не безопасное преобразование, по этому блок остался тут
+        if result as usize == 0 {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "Ошибка в процессе {} изображения!",
+                    ERROR_LOADING
+                ),
+            ));
+        };
+        result
+    } as *mut _;
+    let mut data: *mut VipsImage = ptr::null_mut::<VipsImage>();
+    let crop_result = unsafe { vips_smartcrop(image, &mut data, width, height, 0) };
+    if crop_result != 0 {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!(
                 "Ошибка в процессе {} изображения!",
-                ERROR_LOADING
-            );
-            self.image = Some(*vimage);
-        }
-    }
-
-    pub fn save(file_name: &Path) {
-        
-    }
+                ERROR_CROP
+            ),
+        ));
+    };
+    let save_result = unsafe {
+        vips_jpegsave(
+            data,
+            CString::new(to_file).expect(CSTRING_FAILED).as_ptr(),
+            0,
+        )
+    };
+    if save_result != 0 {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!(
+                "Ошибка в процессе {} изображения!",
+                ERROR_SAVE
+            ),
+        ));
+    };
+    Ok(0)
 }
 
 #[cfg(test)]
@@ -696,11 +713,14 @@ mod tests {
     fn load_image() {
         unsafe {
             let vimage = super::vips_image_new_from_file(
-                CString::new(super::PATH_OWL).expect(super::CSTRING_FAILED).as_ptr(),
+                CString::new(super::PATH_OWL)
+                    .expect(super::CSTRING_FAILED)
+                    .as_ptr(),
                 0,
             );
             assert_ne!(
-                vimage as usize, 0,
+                vimage as usize,
+                0,
                 "Ошибка в процессе {} изображения!",
                 super::ERROR_LOADING
             );
@@ -715,18 +735,22 @@ mod tests {
                 let mut data: *mut super::VipsImage = ptr::null_mut::<super::VipsImage>();
                 let crop_result = super::vips_smartcrop(vimage, &mut data, 100, 100, 0);
                 assert_eq!(
-                    crop_result, 0,
+                    crop_result,
+                    0,
                     "Ошибка в процессе {} изображения!",
                     super::ERROR_CROP
                 );
 
                 let save_result = super::vips_jpegsave(
                     data,
-                    CString::new(super::PATH_CROPOWL).expect(super::CSTRING_FAILED).as_ptr(),
+                    CString::new(super::PATH_CROPOWL)
+                        .expect(super::CSTRING_FAILED)
+                        .as_ptr(),
                     0,
                 );
                 assert_eq!(
-                    save_result, 0,
+                    save_result,
+                    0,
                     "Ошибка в процессе {} изображения!",
                     super::ERROR_SAVE
                 );
@@ -739,5 +763,7 @@ mod tests {
     }
 
     #[test]
-    fn safe_iface() {}
+    fn safe_iface() {
+        super::crop_image(super::PATH_OWL, super::PATH_CROPOWL, 150, 150).unwrap();
+    }
 }
