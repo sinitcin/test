@@ -4,6 +4,8 @@ rust:
 matrix:
   allow_failures:
     - rust: nightly
+before_install:
+  - sudo apt-get install libvips*
 script:
   - cargo build --verbose --all
   - cargo test --verbose --all

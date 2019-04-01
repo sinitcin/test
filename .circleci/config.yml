@@ -12,6 +12,7 @@ jobs:
             - cargo-v1-
       - run: cargo update
       - run: cargo fetch
+      - run: sudo apt-get install libvips*
       - persist_to_workspace:
           root: "."
           paths:
@@ -131,7 +132,7 @@ jobs:
           command: bash <(curl -s https://codecov.io/bash)
 
 workflows:
-  version: 2
+  version: 2.1
   test_all_and_coverage:
     jobs:
       - cargo_fetch
