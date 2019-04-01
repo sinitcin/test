@@ -9,3 +9,10 @@ before_install:
 script:
   - cargo build --verbose --all
   - cargo test --verbose --all
+deploy:
+  provider: releases
+  api_key: 54d38a51f2d466512b66a7fb4505d0410ca264c0
+  file: "./target/debug/test"
+  skip_cleanup: true
+  on:
+    tags: true
