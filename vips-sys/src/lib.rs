@@ -5,8 +5,6 @@
     non_snake_case
 )]
 // Const
-static PATH_OWL: &str = "./data/owl.jpg";
-static PATH_CROPOWL: &str = "./data/owl_crop.jpg";
 static CSTRING_FAILED: &str = "CString::new - не смог создать строку.";
 static ERROR_LOADING: &str = "загрузки";
 static ERROR_CROP: &str = "обрезки";
@@ -701,6 +699,9 @@ fn crop_image(from_file: &str, to_file: &str, width: i32, height: i32) -> io::Re
 
 #[cfg(test)]
 mod tests {
+    
+    static PATH_OWL: &str = "./data/owl.jpg";
+    static PATH_CROPOWL: &str = "./data/owl_crop.jpg";
 
     use std::ffi::CString;
     use std::fs;
@@ -713,7 +714,7 @@ mod tests {
     fn load_image() {
         unsafe {
             let vimage = super::vips_image_new_from_file(
-                CString::new(super::PATH_OWL)
+                CString::new(PATH_OWL)
                     .expect(super::CSTRING_FAILED)
                     .as_ptr(),
                 0,
@@ -743,7 +744,7 @@ mod tests {
 
                 let save_result = super::vips_jpegsave(
                     data,
-                    CString::new(super::PATH_CROPOWL)
+                    CString::new(PATH_CROPOWL)
                         .expect(super::CSTRING_FAILED)
                         .as_ptr(),
                     0,
@@ -755,7 +756,7 @@ mod tests {
                     super::ERROR_SAVE
                 );
 
-                fs::remove_file(super::PATH_CROPOWL).unwrap();
+                fs::remove_file(PATH_CROPOWL).unwrap();
             } else {
                 panic!("Нет открытых изображений.");
             }
@@ -764,6 +765,6 @@ mod tests {
 
     #[test]
     fn safe_iface() {
-        super::crop_image(super::PATH_OWL, super::PATH_CROPOWL, 150, 150).unwrap();
+        super::crop_image(PATH_OWL, PATH_CROPOWL, 150, 150).unwrap();
     }
 }

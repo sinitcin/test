@@ -21,10 +21,12 @@ extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
 extern crate base64_stream;
+extern crate config;
 extern crate errors;
 extern crate vips_sys;
 
 use base64_stream::FromBase64Reader;
+use config::*;
 use errors::*;
 use regex::Regex;
 use rocket::http::ContentType;
@@ -61,6 +63,9 @@ fn index() -> io::Result<NamedFile> {
 fn upload_from_json(data: String) -> Result<String, SimpleError> {
     let v: Value = serde_json::from_str(&data)?;
     let files = v["files"].as_array().unwrap();
+
+    let config = MainConfig::load();
+
     let client = reqwest::Client::builder()
         .proxy(
             reqwest::Proxy::http("http://proxy.bolid.ru:3128")?

@@ -1,19 +1,36 @@
 version: 2.1
 jobs:
-  cargo_fetch:
+  fetch:
     docker:
       - image: rust:latest
-    working_directory: /mnt/crate
+    working_directory: /mnt/project
     steps:
       - checkout
       - restore_cache:
           keys:
             - cargo-v1-{{ checksum "Cargo.toml" }}-
             - cargo-v1-
-      - run: cargo update
-      - run: cargo fetch
-      - run: apt-get update
-      - run: apt-get install -y libvips*
+      - run: apt-get update && apt-get install -y wget curl
+      - run: whereis rustup
+      - run:
+          name: "Install Rustup"
+          command: |
+            set -eux; \
+            PATH="${PATH}:$HOME/.cargo/bin" \
+            RUSTUP_HOME="$HOME/.rustup/" \
+            CARGO_HOME="$HOME/.cargo/" \
+            url="https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init"; \
+            /usr/bin/wget "$url"; \
+            chmod +x rustup-init; \
+            RUSTUP_USE_CURL=1 ./rustup-init -y --no-modify-path --default-toolchain nightly; \
+            rm rustup-init; \
+            chmod -R a+w+x $RUSTUP_HOME $CARGO_HOME; \
+            $HOME/.cargo/env; \
+            rustup --version; \
+            cargo --version; \
+            rustc --version; \
+            cargo update; \
+            cargo fetch;
       - persist_to_workspace:
           root: "."
           paths:
@@ -26,7 +43,7 @@ jobs:
   test:
     docker:
       - image: rust:latest
-    working_directory: /mnt/crate
+    working_directory: /mnt/project
     steps:
       - checkout
       - attach_workspace:
@@ -34,121 +51,111 @@ jobs:
       - restore_cache:
           keys:
             - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
-      - run:
-          name: Print version information
-          command: rustc --version; cargo --version
-      - run:
-          name: Build and test
-          command: cargo test --verbose --frozen
-          environment:
-            # Need this for the coverage run
-            RUSTFLAGS: "-C link-dead-code"
-      - run:
-          name: Prune the output files
-          command: |
-            for file in target/debug/* target/debug/.??*; do
-              [ -d $file -o ! -x $file ] && rm -r $file
-            done
-      - persist_to_workspace:
-          root: "."
-          paths:
-            - target/debug/*
-  test_release:
-    docker:
-      - image: rust:latest
-    working_directory: /mnt/crate
-    steps:
-      - checkout
-      - attach_workspace:
-          at: "."
-      - restore_cache:
-          keys:
-            - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
-      - run:
-          name: Print version information
-          command: rustc --version; cargo --version
-      - run:
-          name: Build and test in release profile
-          command: cargo test --verbose --frozen --release
-  test_nightly:
-    docker:
-      - image: rustlang/rust:nightly
-    working_directory: /mnt/crate
-    steps:
-      - checkout
-      - attach_workspace:
-          at: "."
-      - restore_cache:
-          keys:
-            - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
+      - run: rustup default nightly
+      - run: apt-get update
+      - run: apt-get install -y libvips*
       - run:
           name: Print version information
           command: rustc --version; cargo --version
       - run:
           name: Build and test with nightly Rust
-          command: cargo test --verbose --frozen
-  coverage:
+          command: cargo test --verbose
+  build:
     docker:
-      - image: ragnaroek/kcov:v33
-        entrypoint: /bin/bash
-    working_directory: /mnt/crate
+      - image: rust:latest
+    working_directory: /mnt/project
     steps:
       - checkout
       - attach_workspace:
           at: "."
-      - run: mkdir target/coverage
+      - restore_cache:
+          keys:
+            - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
+      - run: rustup default nightly
+      - run: apt-get update
+      - run: apt-get install -y libvips*
       - run:
-          name: Rerun the tests collecting coverage
-          command: |
-            for file in ./target/debug/*; do
-              if test -x $file; then
-                kcov --verify --exclude-pattern=tests \
-                    target/coverage/$(basename $file) \
-                  $file --quiet
-              fi
-            done
-            kcov --merge target/coverage-merged target/coverage/*
-      - store_artifacts:
-          path: target/coverage
-          destination: coverage
-      - store_artifacts:
-          path: target/coverage-merged
-          destination: coverage-merged
-      - persist_to_workspace:
-          root: "."
-          paths:
-            - target/coverage
-  codecov_upload:
+          name: Print version information
+          command: rustc --version; cargo --version
+      - run:
+          name: Build and test with nightly Rust
+          command: cargo build --verbose
+  deploy:
     docker:
-      - image: buildpack-deps:curl
-    working_directory: /mnt/crate
+      - image: rust:latest
+    working_directory: /mnt/project
     steps:
-      # Codecov uploader needs the source and binaries
-      # exactly as everything was during the test run.
       - checkout
+      - setup_remote_docker:
+          reusable: true
       - attach_workspace:
           at: "."
-      - run:
-          name: Upload to Codecov
-          command: bash <(curl -s https://codecov.io/bash)
+      - restore_cache:
+          keys:
+            - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
+      - run: apt-get update && apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common sudo  python3 git
 
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            VER="17.03.0-ce"
+            curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            mv /tmp/docker/* /usr/bin
+
+      - run:
+          name: Install Docker Compose
+          command: |
+            set -x
+            curl -L https://github.com/docker/compose/releases/download/1.11.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
+            
+      - run: 
+          name: Start container and verify it is working
+          command: |
+            set -x
+            docker-compose -H $DOCKER_HOST -f docker-compose.yml build --no-cache
+  publish:
+    docker:
+      - image: rust:latest
+    working_directory: /mnt/project
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            VER="17.03.0-ce"
+            curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            mv /tmp/docker/* /usr/bin
+      - run:
+          name: Publish to dockerhub
+          command: |
+            export TAG_NUM=v.$CIRCLE_BUILD_NUM
+            docker login -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
+            docker build -t $DOCKER_HUB_USER_ID/test:latest .
+            docker tag $DOCKER_HUB_USER_ID/test:latest $DOCKER_HUB_USER_ID/test:latest
+            docker tag $DOCKER_HUB_USER_ID/test:latest $DOCKER_HUB_USER_ID/test:$TAG_NUM
+            docker push $DOCKER_HUB_USER_ID/test:latest
+            docker push $DOCKER_HUB_USER_ID/test:$TAG_NUM
 workflows:
   version: 2.1
-  test_all_and_coverage:
+  continuous_deployment:
     jobs:
-      - cargo_fetch
+      - fetch
       - test:
           requires:
-            - cargo_fetch
-      - test_release:
+            - fetch
+      - build:
           requires:
-            - cargo_fetch
-      - test_nightly:
-          requires:
-            - cargo_fetch
-      - coverage:
+            - fetch
+      - deploy:
           requires:
             - test
-      - codecov_upload:
+            - build
+      - publish:
           requires:
-            - coverage
+            - deploy

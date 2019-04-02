@@ -1,0 +1,12 @@
+version: '3'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - "CARGO_HOME=$HOME/.cargo"
+      - "RUSTUP_HOME=$HOME/.rustup"
+      - "PATH=${PATH}:$CARGO_HOME/bin:$RUSTUP_HOME"

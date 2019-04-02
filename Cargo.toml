@@ -26,3 +26,4 @@ reqwest = "*"
 base64-stream = "*"
 errors = { path = "errors" }
 vips-sys = { path = "vips-sys" }
+config = { path = "config" }
