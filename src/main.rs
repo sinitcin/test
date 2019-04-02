@@ -53,6 +53,29 @@ use std::time::Duration;
 
 const MAX_IMG_COUNT: u32 = 25;
 
+struct ProxySettings {
+    proxy: String;
+    login: String;
+    password: String;
+}
+
+struct MainConfig {
+    proxy: Some<ProxySettings>,
+    // Остальных настроек пока нет
+}
+
+impl MainConfig {
+    fn load() -> self {
+        MainConfig {
+            Some(ProxySettings {
+                proxy: "",
+                login: "",
+                password: "",
+            })
+        }
+    }
+}
+
 #[get("/")]
 fn index() -> io::Result<NamedFile> {
     NamedFile::open("static/index.html")
