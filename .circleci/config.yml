@@ -41,6 +41,7 @@ jobs:
       - run:
           name: Build and test with nightly Rust
           command: cargo test --verbose --frozen
+  build:
   publish:
   deploy:
     docker:
