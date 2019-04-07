@@ -18,7 +18,7 @@ jobs:
           command: |
             set -eux; \
             PATH="${PATH}:$HOME/.cargo/bin" \
-            RUSTUP_HOME="~/.rustup" \
+            RUSTUP_HOME="/root/.rustup" \
             CARGO_HOME="/root/.cargo/bin" \
             url="https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init"; \
             /usr/bin/wget "$url"; \
