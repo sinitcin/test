@@ -61,4 +61,4 @@ workflows:
             - cargo_fetch
       - coverage:
           requires:
-            - test
+            - test_nightly
