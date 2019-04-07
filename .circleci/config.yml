@@ -75,6 +75,8 @@ jobs:
       - restore_cache:
           keys:
             - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
+      - run: pwd
+      - run: ls
       - run: docker-compose up
 workflows:
   version: 2.1
