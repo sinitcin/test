@@ -25,53 +25,6 @@ jobs:
             - /usr/local/cargo/git
   test:
     docker:
-      - image: rust:latest
-    working_directory: /mnt/crate
-    steps:
-      - checkout
-      - attach_workspace:
-          at: "."
-      - restore_cache:
-          keys:
-            - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
-      - run:
-          name: Print version information
-          command: rustc --version; cargo --version
-      - run:
-          name: Build and test
-          command: cargo test --verbose --frozen
-          environment:
-            # Need this for the coverage run
-            RUSTFLAGS: "-C link-dead-code"
-      - run:
-          name: Prune the output files
-          command: |
-            for file in target/debug/* target/debug/.??*; do
-              [ -d $file -o ! -x $file ] && rm -r $file
-            done
-      - persist_to_workspace:
-          root: "."
-          paths:
-            - target/debug/*
-  test_release:
-    docker:
-      - image: rust:latest
-    working_directory: /mnt/crate
-    steps:
-      - checkout
-      - attach_workspace:
-          at: "."
-      - restore_cache:
-          keys:
-            - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
-      - run:
-          name: Print version information
-          command: rustc --version; cargo --version
-      - run:
-          name: Build and test in release profile
-          command: cargo test --verbose --frozen --release
-  test_nightly:
-    docker:
       - image: rustlang/rust:nightly
     working_directory: /mnt/crate
     steps:
@@ -81,6 +34,7 @@ jobs:
       - restore_cache:
           keys:
             - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
+      - run: rustup default nightly
       - run:
           name: Print version information
           command: rustc --version; cargo --version
@@ -96,59 +50,15 @@ jobs:
       - checkout
       - attach_workspace:
           at: "."
-      - run: mkdir target/coverage
-      - run:
-          name: Rerun the tests collecting coverage
-          command: |
-            for file in ./target/debug/*; do
-              if test -x $file; then
-                kcov --verify --exclude-pattern=tests \
-                    target/coverage/$(basename $file) \
-                  $file --quiet
-              fi
-            done
-            kcov --merge target/coverage-merged target/coverage/*
-      - store_artifacts:
-          path: target/coverage
-          destination: coverage
-      - store_artifacts:
-          path: target/coverage-merged
-          destination: coverage-merged
-      - persist_to_workspace:
-          root: "."
-          paths:
-            - target/coverage
-  codecov_upload:
-    docker:
-      - image: buildpack-deps:curl
-    working_directory: /mnt/crate
-    steps:
-      # Codecov uploader needs the source and binaries
-      # exactly as everything was during the test run.
-      - checkout
-      - attach_workspace:
-          at: "."
-      - run:
-          name: Upload to Codecov
-          command: bash <(curl -s https://codecov.io/bash)
-
+      - run: docker-compose up
 workflows:
   version: 2.1
   test_all_and_coverage:
     jobs:
       - cargo_fetch
-      - test:
-          requires:
-            - cargo_fetch
-      - test_release:
-          requires:
-            - cargo_fetch
       - test_nightly:
           requires:
             - cargo_fetch
       - coverage:
           requires:
             - test
-      - codecov_upload:
-          requires:
-            - coverage
