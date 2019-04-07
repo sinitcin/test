@@ -66,7 +66,7 @@ jobs:
 #      - image: rust:latest
   deploy:
     docker:
-      - image: rustlang/rust:nightly
+      - image: ubuntu:latest
     working_directory: /mnt/project
     steps:
       - checkout
