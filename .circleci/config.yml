@@ -42,7 +42,9 @@ jobs:
           name: Build and test with nightly Rust
           command: cargo test --verbose --frozen
   build:
+      - image: rust:latest
   publish:
+      - image: rust:latest
   deploy:
     docker:
       - image: ragnaroek/kcov:v33
