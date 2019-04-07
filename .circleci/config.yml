@@ -12,6 +12,7 @@ jobs:
             - cargo-v1-
       - run: apt-get update
       - run: apt-get install -y wget curl
+      - run: whereis wget
       - run:
           name: "Install Rustup"
           command: |
