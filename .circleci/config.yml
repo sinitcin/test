@@ -21,12 +21,13 @@ jobs:
             chmod +x rustup-init; \
             RUSTUP_USE_CURL=1 ./rustup-init -y --no-modify-path --default-toolchain nightly; \
             rm rustup-init; \
-            ENV PATH="${PATH}:$HOME/.cargo/bin" \
-            ENV RUSTUP_HOME="~/.rustup" \
             chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
             rustup --version; \
             cargo --version; \
             rustc --version;
+          environment:
+            PATH: "${PATH}:$HOME/.cargo/bin"
+            RUSTUP_HOME: "~/.rustup"
       - run: cargo update
       - run: cargo fetch
       - persist_to_workspace:
