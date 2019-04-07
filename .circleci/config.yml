@@ -3,7 +3,7 @@ jobs:
   fetch:
     docker:
       - image: rust:latest
-    working_directory: /mnt/crate
+    working_directory: /mnt/project
     steps:
       - checkout
       - restore_cache:
@@ -24,7 +24,7 @@ jobs:
   test:
     docker:
       - image: rustlang/rust:nightly
-    working_directory: /mnt/crate
+    working_directory: /mnt/project
     steps:
       - checkout
       - attach_workspace:
@@ -44,7 +44,7 @@ jobs:
   build:
     docker:
       - image: rustlang/rust:nightly
-    working_directory: /mnt/crate
+    working_directory: /mnt/project
     steps:
       - checkout
       - attach_workspace:
@@ -67,7 +67,7 @@ jobs:
   deploy:
     docker:
       - image: rustlang/rust:nightly
-    working_directory: /mnt/crate
+    working_directory: /mnt/project
     steps:
       - checkout
       - attach_workspace:
@@ -75,8 +75,8 @@ jobs:
       - restore_cache:
           keys:
             - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
-      - run: pwd
-      - run: ls
+      - run: curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      - run: chmod +x /usr/local/bin/docker-compose
       - run: docker-compose up
 workflows:
   version: 2.1
