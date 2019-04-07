@@ -56,9 +56,9 @@ workflows:
   test_all_and_coverage:
     jobs:
       - cargo_fetch
-      - test_nightly:
+      - test:
           requires:
             - cargo_fetch
       - coverage:
           requires:
-            - test_nightly
+            - test
