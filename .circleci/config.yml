@@ -82,9 +82,9 @@ workflows:
       - test:
           requires:
             - fetch
-#      - build:
-#          requires:
-#            - fetch
+      - build:
+          requires:
+            - fetch
 #      - publish:
 #          requires:
 #            - test
