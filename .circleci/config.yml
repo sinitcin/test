@@ -4,6 +4,9 @@ jobs:
     docker:
       - image: ubuntu:latest
     working_directory: /mnt/project
+    environment:
+      RUSTUP_HOME: "/root/.rustup"
+      CARGO_HOME: "/root/.cargo/bin"
     steps:
       - checkout
       - restore_cache:
@@ -18,8 +21,6 @@ jobs:
           command: |
             set -eux; \
             PATH="${PATH}:$HOME/.cargo/bin" \
-            RUSTUP_HOME="/root/.rustup" \
-            CARGO_HOME="/root/.cargo/bin" \
             url="https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init"; \
             /usr/bin/wget "$url"; \
             chmod +x rustup-init; \
@@ -28,9 +29,9 @@ jobs:
             chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
             rustup --version; \
             cargo --version; \
-            rustc --version;
-      - run: cargo update
-      - run: cargo fetch
+            rustc --version; \
+            cargo update; \
+            cargo fetch;
       - persist_to_workspace:
           root: "."
           paths:
