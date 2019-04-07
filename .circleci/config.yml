@@ -11,7 +11,7 @@ jobs:
             - cargo-v1-{{ checksum "Cargo.toml" }}-
             - cargo-v1-
       - run: apt-get update
-      - run: apt-get install -y wget
+      - run: apt-get install -y wget curl
       - run:
           name: "Install Rustup"
           command: |
