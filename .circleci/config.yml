@@ -41,7 +41,26 @@ jobs:
       - run:
           name: Build and test with nightly Rust
           command: cargo test --verbose --frozen
-#  build:
+  build:
+    docker:
+      - image: rustlang/rust:nightly
+    working_directory: /mnt/crate
+    steps:
+      - checkout
+      - attach_workspace:
+          at: "."
+      - restore_cache:
+          keys:
+            - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
+      - run: rustup default nightly
+      - run: apt-get update
+      - run: apt-get install -y libvips*
+      - run:
+          name: Print version information
+          command: rustc --version; cargo --version
+      - run:
+          name: Build and test with nightly Rust
+          command: cargo build --verbose
 #      - image: rust:latest
 #  publish:
 #      - image: rust:latest
