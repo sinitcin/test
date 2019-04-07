@@ -28,6 +28,7 @@ jobs:
           environment:
             PATH: "${PATH}:$HOME/.cargo/bin"
             RUSTUP_HOME: "~/.rustup"
+            CARGO_HOME: "~/.cargo"
       - run: cargo update
       - run: cargo fetch
       - persist_to_workspace:
