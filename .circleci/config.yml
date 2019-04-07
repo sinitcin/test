@@ -24,6 +24,8 @@ jobs:
             /usr/bin/wget "$url"; \
             chmod +x rustup-init; \
             RUSTUP_USE_CURL=1 ./rustup-init -y --no-modify-path --default-toolchain nightly; \
+            PATH="${PATH}:$HOME/.cargo/bin" \
+            RUSTUP_HOME="~/.rustup" \
             /root/.cargo/bin/env \
             rm rustup-init; \
             chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
