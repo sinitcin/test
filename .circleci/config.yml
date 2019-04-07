@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   fetch:
     docker:
-      - image: rust:latest
+      - image: ubuntu:latest
     working_directory: /mnt/project
     steps:
       - checkout
@@ -10,6 +10,21 @@ jobs:
           keys:
             - cargo-v1-{{ checksum "Cargo.toml" }}-
             - cargo-v1-
+      - run:
+          name: "Install Rustup"
+          command: |
+            set -eux; \
+            url="https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init"; \
+            wget "$url"; \
+            chmod +x rustup-init; \
+            RUSTUP_USE_CURL=1 ./rustup-init -y --no-modify-path --default-toolchain nightly; \
+            rm rustup-init; \
+            ENV PATH="${PATH}:$HOME/.cargo/bin" \
+            ENV RUSTUP_HOME="~/.rustup" \
+            chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
+            rustup --version; \
+            cargo --version; \
+            rustc --version;
       - run: cargo update
       - run: cargo fetch
       - persist_to_workspace:
@@ -23,7 +38,7 @@ jobs:
             - /usr/local/cargo/git
   test:
     docker:
-      - image: rustlang/rust:nightly
+      - image: ubuntu:latest
     working_directory: /mnt/project
     steps:
       - checkout
@@ -43,7 +58,7 @@ jobs:
           command: cargo test --verbose --frozen
   build:
     docker:
-      - image: rustlang/rust:nightly
+      - image: ubuntu:latest
     working_directory: /mnt/project
     steps:
       - checkout
@@ -83,6 +98,7 @@ jobs:
       - run: apt-get install docker-ce docker-ce-cli containerd.io
       - run: curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
       - run: chmod +x /usr/local/bin/docker-compose
+      - run: docker run hello-world
       - run: docker-compose up
 workflows:
   version: 2.1
