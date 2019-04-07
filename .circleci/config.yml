@@ -12,8 +12,6 @@ jobs:
             - cargo-v1-
       - run: cargo update
       - run: cargo fetch
-      - run: apt-get update
-      - run: apt-get install -y libvips*
       - persist_to_workspace:
           root: "."
           paths:
@@ -23,24 +21,26 @@ jobs:
           paths:
             - /usr/local/cargo/registry
             - /usr/local/cargo/git
-#  test:
-#    docker:
-#      - image: rustlang/rust:nightly
-#    working_directory: /mnt/crate
-#    steps:
-#      - checkout
-#      - attach_workspace:
-#          at: "."
-#      - restore_cache:
-#          keys:
-#            - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
-#      - run: rustup default nightly
-#      - run:
-#          name: Print version information
-#          command: rustc --version; cargo --version
-#      - run:
-#          name: Build and test with nightly Rust
-#          command: cargo test --verbose --frozen
+  test:
+    docker:
+      - image: rustlang/rust:nightly
+    working_directory: /mnt/crate
+    steps:
+      - checkout
+      - attach_workspace:
+          at: "."
+      - restore_cache:
+          keys:
+            - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
+      - run: rustup default nightly
+      - run: apt-get update
+      - run: apt-get install -y libvips*
+      - run:
+          name: Print version information
+          command: rustc --version; cargo --version
+      - run:
+          name: Build and test with nightly Rust
+          command: cargo test --verbose --frozen
 #  build:
 #      - image: rust:latest
 #  publish:
@@ -60,9 +60,9 @@ workflows:
   continuous_deployment:
     jobs:
       - fetch
-#      - test:
-#          requires:
-#            - fetch
+      - test:
+          requires:
+            - fetch
 #      - build:
 #          requires:
 #            - fetch
