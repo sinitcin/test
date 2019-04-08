@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   fetch:
     docker:
-      - image: ubuntu:latest
+      - image: circleci/rust:latest
     working_directory: /mnt/project
 #    environment:
 #      RUSTUP_HOME: "/root/.rustup"
@@ -46,7 +46,7 @@ jobs:
             - /usr/local/cargo/git
   test:
     docker:
-      - image: ubuntu:latest
+      - image: circleci/rust:latest
     working_directory: /mnt/project
     steps:
       - checkout
@@ -66,7 +66,7 @@ jobs:
           command: cargo test --verbose --frozen
   build:
     docker:
-      - image: ubuntu:latest
+      - image: circleci/rust:latest
     working_directory: /mnt/project
     steps:
       - checkout
@@ -89,7 +89,7 @@ jobs:
 #      - image: rust:latest
   deploy:
     docker:
-      - image: ubuntu:latest
+      - image: circleci/rust:latest
     working_directory: /mnt/project
     steps:
       - checkout
