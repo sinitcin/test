@@ -106,20 +106,20 @@ jobs:
             curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
             chmod +x ~/docker-compose
             sudo mv ~/docker-compose /usr/local/bin/docker-compose
-#      - run: curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
-#      - run: apt-key fingerprint 0EBFCD88
-#      - run: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-#      - run: apt-get update
-#      - run: apt-get -y install docker-ce docker-ce-cli containerd.io
-#      - run: curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-#      - run: chmod +x /usr/local/bin/docker-compose
-#      - run: ulimit -n 3000
-#      - run: sudo service docker start
+            curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+            apt-key fingerprint 0EBFCD88
+            add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+            apt-get update
+            apt-get -y install docker-ce docker-ce-cli containerd.io
+            curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
+            ulimit -n 3000
+            sudo service docker start
       - run: 
           name: Start container and verify it is working
           command: |
             set -x
-            sudo docker-compose -H "$DOCKER_HOST" up -d
+            sudo docker-compose -H "$DOCKER_MACHINE_NAME@$DOCKER_HOST" up -d
 workflows:
   version: 2.1
   continuous_deployment:
