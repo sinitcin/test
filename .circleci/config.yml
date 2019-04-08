@@ -94,7 +94,7 @@ jobs:
         - docker
       dependencies:
         pre:
-          - sudo pip install docker-compose
+          - pip install docker-compose
     working_directory: /mnt/project
     steps:
       - checkout
@@ -124,7 +124,7 @@ jobs:
           name: Start container and verify it is working
           command: |
 #            set -x
-            sudo docker-compose up -d
+            docker-compose up -d
 workflows:
   version: 2.1
   continuous_deployment:
