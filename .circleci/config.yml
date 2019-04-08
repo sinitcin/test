@@ -117,7 +117,7 @@ jobs:
           name: Start container and verify it is working
           command: |
             set -x
-            sudo docker-compose -H "$DOCKER_MACHINE_NAME@$DOCKER_HOST" up -d
+            sudo docker-compose -H "$DOCKER_HOST" up -d
 workflows:
   version: 2.1
   continuous_deployment:
