@@ -92,12 +92,14 @@ jobs:
     working_directory: /mnt/project
     steps:
       - checkout
+      - setup_remote_docker:
+          reusable: true
       - attach_workspace:
           at: "."
       - restore_cache:
           keys:
             - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
-      - run: apt-get update && apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common sudo
+      - run: apt-get update && apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common sudo python3 git
       - run: curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
       - run: apt-key fingerprint 0EBFCD88
       - run: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
