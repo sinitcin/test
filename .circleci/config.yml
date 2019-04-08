@@ -87,25 +87,31 @@ jobs:
 #  publish:
 #      - image: rust:latest
   deploy:
-    docker:
-      - image: rust:latest
+    machine:
+      python:
+        version: 2.7.3
+      services:
+        - docker
+      dependencies:
+        pre:
+          - sudo pip install docker-compose
     working_directory: /mnt/project
     steps:
       - checkout
-      - setup_remote_docker:
-          reusable: true
+#      - setup_remote_docker:
+#          reusable: true
       - attach_workspace:
           at: "."
       - restore_cache:
           keys:
             - cargo-v1-{{ checksum "Cargo.toml" }}-{{ checksum "Cargo.lock" }}
-      - run: apt-get update && apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common sudo  python3 git
-      - run:
-          name: Install Docker Compose
-          command: |
-            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-            chmod +x ~/docker-compose
-            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+#      - run: apt-get update && apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common sudo  python3 git
+#      - run:
+#          name: Install Docker Compose
+#          command: |
+#            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+#            chmod +x ~/docker-compose
+#            sudo mv ~/docker-compose /usr/local/bin/docker-compose
 #            curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 #            apt-key fingerprint 0EBFCD88
 #            add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
@@ -117,8 +123,8 @@ jobs:
       - run: 
           name: Start container and verify it is working
           command: |
-            set -x
-            sudo docker-compose -H $DOCKER_HOST up -d
+#            set -x
+            sudo docker-compose up -d
 workflows:
   version: 2.1
   continuous_deployment:
