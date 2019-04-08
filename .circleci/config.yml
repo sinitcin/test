@@ -88,7 +88,7 @@ jobs:
 #      - image: rust:latest
   deploy:
     docker:
-      - image: rust:latest
+      - image: docker:latest
     working_directory: /mnt/project
     steps:
       - checkout
