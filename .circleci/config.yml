@@ -122,9 +122,7 @@ jobs:
       - run: echo $DOCKER_HOST
       - run: 
           name: Start container and verify it is working
-          command: |
-#            set -x
-            docker-compose up -d
+          command: docker-compose up -d
 workflows:
   version: 2.1
   continuous_deployment:
