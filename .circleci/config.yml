@@ -62,7 +62,7 @@ jobs:
           command: rustc --version; cargo --version
       - run:
           name: Build and test with nightly Rust
-          command: cargo test --verbose --frozen
+          command: cargo test --verbose
   build:
     docker:
       - image: rust:latest
