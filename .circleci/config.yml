@@ -131,16 +131,16 @@ jobs:
             curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
             tar -xz -C /tmp -f /tmp/docker-$VER.tgz
             mv /tmp/docker/* /usr/bin
+      # export TAG_NUM=v.$CIRCLE_BUILD_NUM
+      # docker build -t $DOCKER_HUB_USER_ID/test:$TAG_NUM .
+      # docker tag $TAG_NUM $DOCKER_HUB_USER_ID/test:$TAG_NUM
+      # docker push $DOCKER_HUB_USER_ID/test:$TAG_NUM
       - run:
           name: Publish to dockerhub
           command: |
-            export TAG_NUM=v.$CIRCLE_BUILD_NUM
             docker login -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
-#            docker build -t $DOCKER_HUB_USER_ID/test:$TAG_NUM .
             docker build -t $DOCKER_HUB_USER_ID/test:latest .
-#            docker tag $TAG_NUM $DOCKER_HUB_USER_ID/test:$TAG_NUM
-            docker tag latest $DOCKER_HUB_USER_ID/test:latest            
-#            docker push $DOCKER_HUB_USER_ID/test:$TAG_NUM
+            docker tag latest $DOCKER_HUB_USER_ID/test:latest
             docker push $DOCKER_HUB_USER_ID/test:latest
 workflows:
   version: 2.1
