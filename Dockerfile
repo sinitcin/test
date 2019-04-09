@@ -34,9 +34,11 @@ RUN set -eux; \
 RUN export CARGO_HOME="$HOME/.cargo"; \ 
     export RUSTUP_HOME="$HOME/.rustup"; \
     export PATH="${PATH}:$CARGO_HOME/bin:$RUSTUP_HOME"; \
-    apt-get -y install libvips* libssl* \
-    ls \
-    ls target \
-    cargo build
+    apt-get -y install libvips* libssl*; \
+    ls; \
+    ls target; \
+    cargo build; \ 
+    mkdir /opt/test/;
 
-CMD ["test"]
+WORKDIR /opt/test/
+ENTRYPOINT ["/opt/test/app"]
