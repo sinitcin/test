@@ -135,6 +135,8 @@ jobs:
           name: Start container and verify it is working
           command: |
             set -x
+            sudo usermod -ag docker $USER
+            sudo service docker restart
             docker-compose -H $DOCKER_HOST -f docker-compose.yml build --no-cache 
 workflows:
   version: 2.1
