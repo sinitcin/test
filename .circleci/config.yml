@@ -115,7 +115,7 @@ jobs:
           name: Start container and verify it is working
           command: |
             set -x
-            docker-compose -H $DOCKER_HOST -f docker-compose.yml build --no-cache --compress
+            docker-compose -H $DOCKER_HOST -f docker-compose.yml build --no-cache
   publish:
     docker:
       - image: rust:latest
