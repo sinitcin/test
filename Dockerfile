@@ -15,13 +15,13 @@ RUN apt-get update && apt-get install -y \
 ## Ставим Rust и переключаемся на nightly
 RUN set -eux; \
     \
+    ENV PATH="${PATH}:$HOME/.cargo/bin" \
+    ENV RUSTUP_HOME="~/.rustup" \
     url="https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init"; \
     wget "$url"; \
     chmod +x rustup-init; \
     RUSTUP_USE_CURL=1 ./rustup-init -y --no-modify-path --default-toolchain nightly; \
     rm rustup-init; \
-    ENV PATH="${PATH}:$HOME/.cargo/bin" \
-    ENV RUSTUP_HOME="~/.rustup" \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
     rustup --version; \
     cargo --version; \
