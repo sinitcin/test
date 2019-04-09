@@ -126,11 +126,12 @@ jobs:
       - run:
           name: Publish to dockerhub
           command: |
+            export TAG_NUM=v.$CIRCLE_BUILD_NUM.$CIRCLE_SHA1
             docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
-            docker tag dockerapp_dockerapp $DOCKER_HUB_USER_ID/dockerapp:$CIRCLE_SHA1
-            docker tag dockerapp_dockerapp $DOCKER_HUB_USER_ID/dockerapp:latest
-            docker push $DOCKER_HUB_USER_ID/dockerapp:$CIRCLE_SHA1
-            docker push $DOCKER_HUB_USER_ID/dockerapp:latest
+            docker tag $TAG_NUM $DOCKER_HUB_USER_ID/test:$TAG_NUM
+            docker tag $TAG_NUM $DOCKER_HUB_USER_ID/test:latest
+            docker push $DOCKER_HUB_USER_ID/test:$TAG_NUM
+            docker push $DOCKER_HUB_USER_ID/test:latest
 workflows:
   version: 2.1
   continuous_deployment:
