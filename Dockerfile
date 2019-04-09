@@ -28,16 +28,11 @@ RUN set -eux; \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
     rustup --version; \
     cargo --version; \
-    rustc --version;
-
-# Собираем проект и запускаем
-RUN export CARGO_HOME="$HOME/.cargo"; \ 
-    export RUSTUP_HOME="$HOME/.rustup"; \
-    export PATH="${PATH}:$CARGO_HOME/bin:$RUSTUP_HOME"; \
-    apt-get -y install libvips* libssl*; \
+    rustc --version; \
+    apt-get -y install libvips42 libvips-dev libssl-dev; \
+    cargo build; \ 
     ls; \
     ls target; \
-    cargo build; \ 
     mkdir /opt/test/;
 
 WORKDIR /opt/test/
