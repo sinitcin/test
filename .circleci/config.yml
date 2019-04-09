@@ -139,7 +139,7 @@ jobs:
             docker build -t $DOCKER_HUB_USER_ID/test:$TAG_NUM .
             docker build -t $DOCKER_HUB_USER_ID/test:latest .
             docker tag $TAG_NUM $DOCKER_HUB_USER_ID/test:$TAG_NUM
-            docker tag $TAG_NUM $DOCKER_HUB_USER_ID/test:latest            
+            docker tag latest $DOCKER_HUB_USER_ID/test:latest            
             docker push $DOCKER_HUB_USER_ID/test:$TAG_NUM
             docker push $DOCKER_HUB_USER_ID/test:latest
 workflows:
