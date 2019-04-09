@@ -140,7 +140,7 @@ jobs:
           command: |
             docker login -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
             docker build -t $DOCKER_HUB_USER_ID/test:latest .
-            docker tag latest $DOCKER_HUB_USER_ID/test:latest
+            docker tag $DOCKER_HUB_USER_ID/test:latest $DOCKER_HUB_USER_ID/test:latest
             docker push $DOCKER_HUB_USER_ID/test:latest
 workflows:
   version: 2.1
