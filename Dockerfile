@@ -22,8 +22,8 @@ RUN set -eux; \
     wget "$url"; \
     chmod +x rustup-init; \
     RUSTUP_USE_CURL=1 ./rustup-init -y --no-modify-path --default-toolchain nightly; \
-    chmod +x $CARGO_HOME\env; \
-    $CARGO_HOME\env; \
+    chmod +x $CARGO_HOME/env; \
+    $CARGO_HOME/env; \
     rm rustup-init; \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
     rustup --version; \
