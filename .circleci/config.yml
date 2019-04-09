@@ -135,8 +135,9 @@ jobs:
           name: Publish to dockerhub
           command: |
             export TAG_NUM=v.$CIRCLE_BUILD_NUM
-            docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
+            docker login -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
             docker build -t $DOCKER_HUB_USER_ID/test:$TAG_NUM .
+            docker build -t $DOCKER_HUB_USER_ID/test:latest .
             docker tag $TAG_NUM $DOCKER_HUB_USER_ID/test:$TAG_NUM
             docker tag $TAG_NUM $DOCKER_HUB_USER_ID/test:latest            
             docker push $DOCKER_HUB_USER_ID/test:$TAG_NUM
