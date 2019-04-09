@@ -115,7 +115,22 @@ jobs:
           name: Start container and verify it is working
           command: |
             set -x
-            docker-compose -H $DOCKER_HOST -f docker-compose.yml build --no-cache 
+            docker-compose -H $DOCKER_HOST -f docker-compose.yml build --no-cache --compress
+  publish:
+    docker:
+      - image: rust:latest
+    working_directory: /mnt/project
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Publish to dockerhub
+          command: |
+            docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
+            docker tag dockerapp_dockerapp $DOCKER_HUB_USER_ID/dockerapp:$CIRCLE_SHA1
+            docker tag dockerapp_dockerapp $DOCKER_HUB_USER_ID/dockerapp:latest
+            docker push $DOCKER_HUB_USER_ID/dockerapp:$CIRCLE_SHA1
+            docker push $DOCKER_HUB_USER_ID/dockerapp:latest
 workflows:
   version: 2.1
   continuous_deployment:
@@ -131,6 +146,6 @@ workflows:
           requires:
             - test
             - build
-#      - publish:
-#          requires:
-#            - publish
+      - publish:
+          requires:
+            - publish

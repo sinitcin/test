@@ -30,12 +30,11 @@ RUN set -eux; \
     cargo --version; \
     rustc --version; \
     apt-get -y install libvips42 libvips-dev libssl-dev; \
-    cargo build; \ 
-    ls; \
-    ls target/debug; \
+    cargo build; \
     mkdir /opt/test/; \
-    cp target/debug/test /opt/test/; \
-    cp -r static /opt/test/; 
+    cp target/debug/test /opt/test/app; \
+    cp -r static /opt/test/; \
+    ls /opt/test/;
 
 WORKDIR /opt/test/
 ENTRYPOINT ["/opt/test/app"]
