@@ -135,7 +135,10 @@ jobs:
           name: Start container and verify it is working
           command: |
             set -x
+            sudo groupadd docker
             sudo usermod -ag docker $USER
+            sudo chown "$USER":"$USER" /home/"$USER"/.docker -R
+            sudo chmod g+rwx "$HOME/.docker" -R
             sudo service docker restart
             docker-compose -H $DOCKER_HOST -f docker-compose.yml build --no-cache 
 workflows:
