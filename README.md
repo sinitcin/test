@@ -1,4 +1,4 @@
-# test - [![Build Status](https://travis-ci.org/sinitcin/test.svg?branch=master)](https://travis-ci.org/sinitcin/test)
+# test - [![Build Status](https://travis-ci.org/sinitcin/test.svg?branch=master)](https://travis-ci.org/sinitcin/test) [![CircleCI](https://circleci.com/gh/sinitcin/test.svg?style=svg)](https://circleci.com/gh/sinitcin/test)
 --
 ## План выполнения:
 1. ~~Возможность загружать несколько файлов.~~
