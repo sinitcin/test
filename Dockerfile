@@ -32,8 +32,10 @@ RUN set -eux; \
     apt-get -y install libvips42 libvips-dev libssl-dev; \
     cargo build; \ 
     ls; \
-    ls target; \
-    mkdir /opt/test/;
+    ls target/debug; \
+    mkdir /opt/test/; \
+    cp target/debug/test /opt/test/; \
+    cp -r static /opt/test/; 
 
 WORKDIR /opt/test/
 ENTRYPOINT ["/opt/test/app"]
