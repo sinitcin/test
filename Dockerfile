@@ -15,8 +15,8 @@ RUN apt-get update && apt-get install -y \
 ## Ставим Rust и переключаемся на nightly
 RUN set -eux; \
     \
-    ENV PATH="${PATH}:$HOME/.cargo/bin" \
-    ENV RUSTUP_HOME="~/.rustup" \
+    export PATH="${PATH}:$HOME/.cargo/bin" \
+    export RUSTUP_HOME="~/.rustup" \
     url="https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init"; \
     wget "$url"; \
     chmod +x rustup-init; \
