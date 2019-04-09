@@ -31,5 +31,8 @@ RUN set -eux; \
     rustc --version;
 
 # Собираем проект и запускаем
-RUN cargo install --path .
+RUN export CARGO_HOME="$HOME/.cargo"; \ 
+    export RUSTUP_HOME="$HOME/.rustup"; \
+    export PATH="${PATH}:$CARGO_HOME/bin:$RUSTUP_HOME"; \
+    cargo install --path .
 CMD ["test"]

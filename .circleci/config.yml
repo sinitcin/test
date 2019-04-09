@@ -4,9 +4,6 @@ jobs:
     docker:
       - image: rust:latest
     working_directory: /mnt/project
-#    environment:
-#      RUSTUP_HOME: "/root/.rustup"
-#      CARGO_HOME: "/root/.cargo/bin"
     steps:
       - checkout
       - restore_cache:
@@ -83,9 +80,6 @@ jobs:
       - run:
           name: Build and test with nightly Rust
           command: cargo build --verbose
-#      - image: rust:latest
-#  publish:
-#      - image: rust:latest
   deploy:
     docker:
       - image: rust:latest
@@ -116,20 +110,7 @@ jobs:
             set -x
             curl -L https://github.com/docker/compose/releases/download/1.11.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
             chmod +x /usr/local/bin/docker-compose
-
-#      - run:
-#          name: Install Docker Compose
-#          command: |
-#            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-#            chmod +x ~/docker-compose
-#            sudo mv ~/docker-compose /usr/local/bin/docker-compose
-#            curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
-#            apt-key fingerprint 0EBFCD88
-#            add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-#            apt-get update
-#            apt-get -y install docker-ce docker-ce-cli containerd.io
-#            curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-#            chmod +x /usr/local/bin/docker-compose
+            
       - run: 
           name: Start container and verify it is working
           command: |
