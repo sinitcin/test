@@ -148,4 +148,4 @@ workflows:
             - build
       - publish:
           requires:
-            - publish
+            - deploy
