@@ -2,7 +2,6 @@ extern crate bindgen;
 
 use std::env;
 use std::fs::{self, DirEntry};
-use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 
 fn get_exedir(env_path: &str, level: u8) -> String {
@@ -68,9 +67,9 @@ fn recurse_copy(out_dir: &str, proj_dir: &str, other_dir: &str) -> Result<(), st
 }
 
 fn generate_bindings() {
-    println!("cargo:rustc-link-lib=ImageMagick");
+    println!("cargo:rustc-link-lib=libvips");
     let bindings = bindgen::Builder::default()
-        .header("wrapper.h")
+        .header("libvips.h")
         .generate()
         .expect("Unable to generate bindings");
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
@@ -85,16 +84,19 @@ fn main() -> Result<(), std::io::Error> {
         return Ok(());
     }
 
-    // Создание биндингов
-    //generate_bindings();
+    if let Ok(_expr) = env::var("NEED_GENERATE_BINDINGS") {
+        generate_bindings();
+    }
 
     // Получаем переменные
     let env_out_dir = env::var("OUT_DIR").unwrap();
     // let env_out_dir = "C:\\sci_questionnaire\\target\\debug\\build";
+
     let out_dir = get_exedir(&env_out_dir, 4);
     let proj_dir = get_exedir(&env_out_dir, 2);
     let templates_dir = format!("{}\\templates", proj_dir);
     let static_dir = format!("{}\\static", proj_dir);
+
     // Сканируем директории шаблонов
     recurse_copy(&out_dir, &proj_dir, &templates_dir)?;
     recurse_copy(&out_dir, &proj_dir, &static_dir)?;

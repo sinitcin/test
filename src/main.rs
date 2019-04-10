@@ -34,10 +34,9 @@ use rocket::request::Request;
 use rocket::response::{NamedFile, Redirect, Response};
 use rocket::Data;
 use rocket_include_static_resources::EtagIfNoneMatch;
-use rocket_multipart_form_data::mime;
 use rocket_multipart_form_data::{
-    MultipartFormData, MultipartFormDataError, MultipartFormDataField, MultipartFormDataOptions,
-    RawField,
+    mime, MultipartFormData, MultipartFormDataError, MultipartFormDataField,
+    MultipartFormDataOptions, RawField, SingleRawField,
 };
 use rocket_raw_response::RawResponse;
 use serde_json::{
@@ -65,22 +64,20 @@ fn upload_from_json(data: String) -> Result<String, SimpleError> {
     let files = v["files"].as_array().unwrap();
 
     let config = MainConfig::load();
+    let client = match config.proxy {
+        Some(proxy_param) => reqwest::Client::builder()
+            .proxy(reqwest::Proxy::all(&proxy_param.proxy)?.basic_auth(
+                &proxy_param.login.unwrap_or("".to_string()),
+                &proxy_param.password.unwrap_or("".to_string()),
+            ))
+            .use_default_tls()
+            .build()?,
+        None => reqwest::Client::builder().use_default_tls().build()?,
+    };
 
-    let client = reqwest::Client::builder()
-        .proxy(
-            reqwest::Proxy::http("http://proxy.bolid.ru:3128")?
-                .basic_auth("sinicin", "130492130492"),
-        )
-        .proxy(
-            reqwest::Proxy::https("http://proxy.bolid.ru:3128")?
-                .basic_auth("sinicin", "130492130492"),
-        )
-        .use_default_tls()
-        .build()?;
     for (filenum, file) in files.iter().enumerate() {
         let file = file.as_str().unwrap();
         if file.starts_with("data:image/") {
-            // dbg!(file);
             let regex = match Regex::new(r"(?m)data:image.([a-z]*);base64,") {
                 Ok(r) => r,
                 Err(e) => {
@@ -207,7 +204,10 @@ fn upload_multipart(content_type: &ContentType, img_count: u32, data: Data) -> R
             RawField::Multiple(raws) => {
                 println!("RawField::Multiple");
                 for raw in raws {
-                    //let content_type = raw.content_type;
+                    raw_save(raw, "").unwrap();
+                    /*
+                    let content_type = raw.content_type;
+
                     let file_name = raw.file_name.unwrap_or("images[]".to_string());
                     let data = raw.raw;
 
@@ -217,6 +217,8 @@ fn upload_multipart(content_type: &ContentType, img_count: u32, data: Data) -> R
                     file.write_all(&data).unwrap();
 
                     //RawResponse::from_vec(data, file_name, content_type)
+                    response = RawResponse::from_vec(data, file_name, content_type);
+                    */
                 }
                 unreachable!()
             }
@@ -229,6 +231,26 @@ fn upload_multipart(content_type: &ContentType, img_count: u32, data: Data) -> R
             Some(mime::TEXT_PLAIN_UTF_8),
         ),
     }
+}
+
+fn raw_to_imgbase64(raw: &std::vec::Vec<u8>) -> String {
+    "".to_string()
+    //data:image/{};base64,{}
+}
+
+fn raw_save(
+    raw: rocket_multipart_form_data::SingleRawField,
+    json_resp: &str,
+) -> Result<String, SimpleError> {
+    //
+    let file_name = raw.file_name.unwrap_or("images[]".to_string());
+    let file_name = Path::new("upload").join(&file_name);
+    let data = raw.raw;
+    dbg!(file_name.extension());
+    let mut file = File::create(file_name.to_str().unwrap())?;    
+    file.write_all(&data)?;
+    raw_to_imgbase64(&data);
+    Ok("".to_string())
 }
 
 #[get("/<file..>")]
