@@ -1,13 +1,13 @@
 use std::env;
 
 pub struct TestProxySettings {
-    proxy: String,
-    login: Option<String>,
-    password: Option<String>,
+    pub proxy: String,
+    pub login: Option<String>,
+    pub password: Option<String>,
 }
 
 pub struct MainConfig {
-    proxy: Option<TestProxySettings>,
+    pub proxy: Option<TestProxySettings>,
     // Остальных настроек пока нет
 }
 
