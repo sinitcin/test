@@ -66,10 +66,11 @@ fn recurse_copy(out_dir: &str, proj_dir: &str, other_dir: &str) -> Result<(), st
     Ok(())
 }
 
+/*
 fn generate_bindings() {
-    println!("cargo:rustc-link-lib=libvips");
+    println!("cargo:rustc-link-lib=vips");
     let bindings = bindgen::Builder::default()
-        .header("libvips.h")
+        .header("/usr/include/vips/vips.h")
         .generate()
         .expect("Unable to generate bindings");
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
@@ -77,15 +78,12 @@ fn generate_bindings() {
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");
 }
+*/
 
 fn main() -> Result<(), std::io::Error> {
     // Мы не в CI?
     if let Ok(_expr) = env::var("TRAVIS_RUST_VERSION") {
         return Ok(());
-    }
-
-    if let Ok(_expr) = env::var("NEED_GENERATE_BINDINGS") {
-        generate_bindings();
     }
 
     // Получаем переменные

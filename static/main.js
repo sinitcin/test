@@ -159,7 +159,13 @@ function uploadFiles() {
       });
       xhr.addEventListener('readystatechange', function(e) {
         if (xhr.readyState == 4 && xhr.status == 200) {
-          updateProgress(i, 100)
+          var jarr = JSON.parse(xhr.response);
+          for(var i in jarr) {
+            let img = document.createElement('img');
+            img.src = jarr[i];
+            document.getElementById('gallery').appendChild(img);            
+          }
+          updateProgress(i, 100);
         }
       });
       xhr.send(formData);
@@ -178,6 +184,12 @@ function uploadRest() {
   })
   xhr.addEventListener('readystatechange', function(e) {
     if (xhr.readyState == 4 && xhr.status == 200) {
+      var jarr = JSON.parse(xhr.response);
+      for(var i in jarr) {
+        let img = document.createElement('img');
+        img.src = jarr[i];
+        document.getElementById('gallery').appendChild(img);            
+      }
       updateProgress(i, 100)
     }
   })

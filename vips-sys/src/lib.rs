@@ -651,7 +651,7 @@ extern "C" {
 }
 
 // Безопасный интерфейс
-fn crop_image(from_file: &str, to_file: &str, width: i32, height: i32) -> io::Result<i32> {
+pub fn crop_image(from_file: &str, to_file: &str, width: i32, height: i32) -> io::Result<i32> {
     let image = unsafe {
         let result =
             vips_image_new_from_file(CString::new(from_file).expect(CSTRING_FAILED).as_ptr(), 0);
