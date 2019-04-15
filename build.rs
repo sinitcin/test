@@ -2,7 +2,7 @@ extern crate bindgen;
 
 use std::env;
 use std::fs::{self, DirEntry};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 fn get_exedir(env_path: &str, level: u8) -> String {
     let mut curr_level = 0;

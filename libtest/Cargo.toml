@@ -1,20 +1,8 @@
 [package]
-name = "test"
+name = "libtest"
 version = "0.1.0"
-authors = ["Антон Синицын <antony@email.su>"]
+authors = ["sinitcin <antony@email.su>"]
 edition = "2018"
-build = "build.rs"
-
-[workspace]
-members = [
-    "errors",
-    "vips-sys",
-    "config",
-    "libtest",
-]
-
-[build-dependencies]
-bindgen = "*"
 
 [dependencies]
 regex = "*"
@@ -24,15 +12,13 @@ serde = "*"
 serde_derive = "*"
 serde_json = "*"
 mime = "0.3.*"
-multipart = "0.15.*"
-chrono = "0.4.*"
+
 rocket-include-static-resources = "0.7"
 rocket-raw-response = "0.3"
 lazy_static = "1.2.*"
 lazy-static-include = "1.2.*"
 reqwest = "*"
 base64-stream = "*"
-errors = { path = "errors" }
-vips-sys = { path = "vips-sys" }
-config = { path = "config" }
-libtest = { path = "libtest" }
+vips-sys = { path = "../vips-sys" }
+errors = { path = "../errors" }
+config = { path = "../config" }

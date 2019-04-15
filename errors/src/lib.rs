@@ -16,7 +16,6 @@ pub enum SimpleError {
 }
 
 impl fmt::Display for SimpleError {
-
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}", self)
     }

@@ -699,7 +699,7 @@ pub fn crop_image(from_file: &str, to_file: &str, width: i32, height: i32) -> io
 
 #[cfg(test)]
 mod tests {
-    
+
     static PATH_OWL: &str = "./data/owl.jpg";
     static PATH_CROPOWL: &str = "./data/owl_crop.jpg";
 

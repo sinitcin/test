@@ -13,7 +13,6 @@ pub struct MainConfig {
 
 impl MainConfig {
     pub fn load() -> Self {
-
         let proxy = match env::var("TEST_PROXY") {
             Ok(val) => Some(TestProxySettings {
                 proxy: val.to_string(),
@@ -22,9 +21,7 @@ impl MainConfig {
             }),
             Err(_e) => None,
         };
-        MainConfig {
-            proxy
-        }
+        MainConfig { proxy }
     }
 }
 
