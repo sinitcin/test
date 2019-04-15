@@ -258,6 +258,26 @@ fn upload_multipart(content_type: &ContentType, img_count: u32, data: Data) -> R
     }
 }
 
+fn raw_to_imgbase64(raw: &std::vec::Vec<u8>) -> String {
+    "".to_string()
+    //data:image/{};base64,{}
+}
+
+fn raw_save(
+    raw: rocket_multipart_form_data::SingleRawField,
+    json_resp: &str,
+) -> Result<String, SimpleError> {
+    //
+    let file_name = raw.file_name.unwrap_or("images[]".to_string());
+    let file_name = Path::new("upload").join(&file_name);
+    let data = raw.raw;
+    dbg!(file_name.extension());
+    let mut file = File::create(file_name.to_str().unwrap())?;    
+    file.write_all(&data)?;
+    raw_to_imgbase64(&data);
+    Ok("".to_string())
+}
+
 #[get("/<file..>")]
 fn files(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new("static/").join(file)).ok()
