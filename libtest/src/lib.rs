@@ -1,13 +1,9 @@
 extern crate base64_stream;
 extern crate config;
-//extern crate regex;
-//extern crate reqwest;
-//extern crate lazy_static_include;
-//extern crate rocket_include_static_resources;
-//extern crate rocket_raw_response;
-//extern crate rocket;
 extern crate errors;
-//extern crate rocket_multipart_form_data;
+extern crate regex;
+extern crate reqwest;
+extern crate rocket_multipart_form_data;
 extern crate vips_sys;
 
 use base64_stream::{FromBase64Reader, ToBase64Reader};
@@ -21,6 +17,7 @@ use std::io;
 use std::io::*;
 use std::path::Path;
 
+// Преобразование файла в формат img base64
 pub fn to_imgbase64(crop_path: &str, ext: &str) -> io::Result<String> {
     let mut buffer = String::new();
     let file = File::open(crop_path)?;
@@ -29,7 +26,9 @@ pub fn to_imgbase64(crop_path: &str, ext: &str) -> io::Result<String> {
     Ok(format!("data:image/{};base64,{}", ext, buffer))
 }
 
-pub fn raw_save(files: &mut Vec<String>, raw: rocket_multipart_form_data::SingleRawField) {
+// Сохранение изображений из multipart form data с изменением размера до 100х100 пикселей
+// в вектор response_files
+pub fn raw_save(response_files: &mut Vec<String>, raw: rocket_multipart_form_data::SingleRawField) {
     // Сохранение файла
     let file_path = Path::new("upload");
     let photo_name = raw.file_name.unwrap_or("images[]".to_string());
@@ -46,13 +45,15 @@ pub fn raw_save(files: &mut Vec<String>, raw: rocket_multipart_form_data::Single
 
     // Добавляем в массив
     let b64file = to_imgbase64(crop_path, file_ext.to_str().unwrap()).unwrap();
-    files.push(b64file);
+    response_files.push(b64file);
 
     // Удаляем файл
     fs::remove_file(file_name).unwrap();
     fs::remove_file(crop_path).unwrap();
 }
 
+// Сохранение изображений из REST с изменением размера до 100х100 пикселей
+// в вектор response_files
 pub fn upload_from_json(
     response_files: &mut Vec<String>,
     data: String,
@@ -139,12 +140,4 @@ pub fn upload_from_json(
         }
     }
     Ok(data)
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
 }

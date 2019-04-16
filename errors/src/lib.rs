@@ -49,11 +49,3 @@ impl<'r> Responder<'r> for SimpleError {
             .ok()
     }
 }
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}

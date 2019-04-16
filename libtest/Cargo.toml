@@ -6,19 +6,10 @@ edition = "2018"
 
 [dependencies]
 regex = "*"
-rocket = "0.4"
 rocket-multipart-form-data = { git = "https://github.com/magiclen/rocket-multipart-form-data.git" }
-serde = "*"
-serde_derive = "*"
 serde_json = "*"
-mime = "0.3.*"
-
-rocket-include-static-resources = "0.7"
-rocket-raw-response = "0.3"
-lazy_static = "1.2.*"
-lazy-static-include = "1.2.*"
-reqwest = "*"
 base64-stream = "*"
+reqwest = "*"
 vips-sys = { path = "../vips-sys" }
 errors = { path = "../errors" }
 config = { path = "../config" }

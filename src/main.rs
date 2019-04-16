@@ -1,59 +1,28 @@
 #![feature(const_vec_new)]
 #![feature(plugin, decl_macro, proc_macro_hygiene)]
-#![allow(unused_imports)]
-#![allow(dead_code)]
 
-extern crate regex;
-extern crate reqwest;
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate lazy_static_include;
-#[macro_use]
 extern crate rocket_include_static_resources;
 extern crate rocket_raw_response;
 #[macro_use]
 extern crate rocket;
 extern crate rocket_multipart_form_data;
-extern crate serde;
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
 extern crate serde_json;
-extern crate base64_stream;
-extern crate config;
-extern crate errors;
 extern crate libtest;
 extern crate vips_sys;
 
-use base64_stream::{FromBase64Reader, ToBase64Reader};
-use config::*;
-use errors::*;
 use libtest::*;
-use regex::Regex;
 use rocket::http::ContentType;
 use rocket::request::Request;
-use rocket::response::{NamedFile, Redirect, Response};
+use rocket::response::NamedFile;
 use rocket::Data;
-use rocket_include_static_resources::EtagIfNoneMatch;
 use rocket_multipart_form_data::{
     mime, MultipartFormData, MultipartFormDataError, MultipartFormDataField,
-    MultipartFormDataOptions, RawField, SingleRawField,
+    MultipartFormDataOptions, RawField
 };
 use rocket_raw_response::RawResponse;
-use serde_json::{
-    from_reader, from_slice, from_str, from_value, json, to_string, to_string_pretty, to_value,
-    to_vec, to_writer, Deserializer, Number, Value,
-};
-use std::ffi::CString;
-use std::fs;
-use std::fs::File;
+use serde_json::{to_vec, Value};
 use std::io;
-use std::io::prelude::*;
-use std::io::{Cursor, Error, ErrorKind};
 use std::path::{Path, PathBuf};
-use std::thread;
-use std::time::Duration;
 
 const MAX_IMG_COUNT: u32 = 25;
 

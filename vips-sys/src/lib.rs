@@ -4,6 +4,19 @@
     non_upper_case_globals,
     non_snake_case
 )]
+
+///
+/// # Библиотека VIPS
+/// Чтобы использовать VIPS нужно выполнить в терминале:
+/// ```bash
+/// $sudo apt-get install libvips*
+/// ```
+/// Версия не должна быть менее 8.8 чтобы в этой либе был smart_crop
+
+//
+//  # Биндинги
+//
+
 // Const
 static CSTRING_FAILED: &str = "CString::new - не смог создать строку.";
 static ERROR_LOADING: &str = "загрузки";
@@ -13,15 +26,6 @@ static ERROR_SAVE: &str = "сохранения";
 use std::ffi::CString;
 use std::os::raw::{c_char, c_int};
 use std::{io, ptr};
-
-///
-/// # Библиотека VIPS
-/// Чтобы использовать VIPS нужно выполнить в терминале:
-/// ```bash
-/// $sudo apt-get install libvips*
-/// ```
-//  # Биндинги
-//
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -698,7 +702,7 @@ pub fn crop_image(from_file: &str, to_file: &str, width: i32, height: i32) -> io
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
 
     static PATH_OWL: &str = "./data/owl.jpg";
     static PATH_CROPOWL: &str = "./data/owl_crop.jpg";
@@ -711,7 +715,7 @@ mod tests {
     static mut image: Option<super::VipsImage> = None;
 
     #[test]
-    fn load_image() {
+    pub fn load_image() {
         unsafe {
             let vimage = super::vips_image_new_from_file(
                 CString::new(PATH_OWL)
@@ -730,7 +734,7 @@ mod tests {
     }
 
     #[test]
-    fn smart_crop() {
+    pub fn smart_crop() {
         unsafe {
             if let Some(ref mut vimage) = image {
                 let mut data: *mut super::VipsImage = ptr::null_mut::<super::VipsImage>();
@@ -764,7 +768,7 @@ mod tests {
     }
 
     #[test]
-    fn safe_iface() {
+    pub fn safe_iface() {
         super::crop_image(PATH_OWL, PATH_CROPOWL, 150, 150).unwrap();
     }
 }
